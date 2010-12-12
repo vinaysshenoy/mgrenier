@@ -59,8 +59,6 @@ package com.mgrenier.net
 					if (this.farId == "")
 						break;
 					
-					//Console.log(this, "Client connected:", this.streamOut.peerStreams.length, this.farId);
-					
 					// Open stream to new connection
 					var streamIn:NetStream = new NetStream(this.netConnection, this.farId);
 					streamIn.addEventListener(NetStatusEvent.NET_STATUS, this.handlerNetStatus);
@@ -81,7 +79,7 @@ package com.mgrenier.net
 					
 					var id:int = this.clientIdFromFarId(NetStream(e.currentTarget).farID),
 						stream:NetStream = NetStream(this.streamIn[id]);
-					this.dispatchEvent(new CirrusEvent(CirrusEvent.CLIENT_DISCONNECTED, e.info.farId, null, id));
+					this.dispatchEvent(new CirrusEvent(CirrusEvent.CLIENT_DISCONNECTED, NetStream(e.currentTarget).farID, null, id));
 					
 					stream.removeEventListener(NetStatusEvent.NET_STATUS, this.handlerNetStatus);
 					stream.close();
@@ -89,7 +87,7 @@ package com.mgrenier.net
 					delete this.streamIn[id];
 					
 				default:
-					//Console.log(this, "Changed:", e.info.code, e.info.description);
+					Console.debug(this, "Changed:", e.info.code, e.info.description);
 			}
 		}
 		
@@ -133,12 +131,33 @@ package com.mgrenier.net
 		/**
 		 * Send packet
 		 * 
-		 * @param	packet
+		 * @param	data
 		 */
 		override public function send (data:*):void
 		{
 			if (this.streamOut)
 				this.streamOut.send("receiveData", new CirrusPacket(null, data));
+		}
+		
+		/**
+		 * Send packet to specific client
+		 * 
+		 * @param	id
+		 * @param	data
+		 */
+		public function sendTo (id:int, data:*):void
+		{
+			if (!this.streamIn[id])
+				return;
+			var farId:String = NetStream(this.streamIn[id]).farID,
+				i:int,
+				n:int;
+			for (i = 0, n = this.streamOut.peerStreams.length; i < n; ++i)
+				if (NetStream(this.streamOut.peerStreams[i]).farID == farId)
+				{
+					NetStream(this.streamOut.peerStreams[i]).send("receiveData", new CirrusPacket(null, data));
+					return;
+				}
 		}
 		
 		/**

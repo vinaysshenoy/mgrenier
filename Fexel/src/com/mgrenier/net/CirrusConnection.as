@@ -53,7 +53,7 @@ package com.mgrenier.net
 					this.handleStreamClosed(e);
 					break;
 				default:
-					Console.log(this, "handlerNetConnection:", e.info.code, e.info.description);
+					Console.debug(this, "handlerNetConnection:", e.info.code, e.info.description);
 			}
 		}
 		

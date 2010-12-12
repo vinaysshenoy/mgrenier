@@ -78,7 +78,7 @@ package com.mgrenier.net
 					break;
 				
 				default:
-					//Console.log(this, "Changed:", e.info.code, e.info.description);
+					Console.debug(this, "Changed:", e.info.code, e.info.description);
 			}
 		}
 		
