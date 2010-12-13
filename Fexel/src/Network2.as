@@ -332,14 +332,14 @@ class Yoshi extends AnimatedSprite
 		this.addAnimation("fallLeft", [36], false);
 		this.play(this.lastAnim);
 		
-		/*var polygon:Vector.<Vec2D> = new Vector.<Vec2D>();
+		var polygon:Vector.<Vec2D> = new Vector.<Vec2D>();
 		polygon.push(new Vec2D(14, 19));
 		//polygon.push(new Vec2D(42, 27));
 		polygon.push(new Vec2D(42, 19));
 		polygon.push(new Vec2D(22, 46));
-		yoshi.setShape(new Polygon(polygon));*/
+		//this.setShape(new Polygon(polygon));
 		this.setShape(new Circle(26, 30, 16));
-		//yoshi.setShape(new Box(0, 0, 48, 48));
+		//this.setShape(new Box(0, 0, 48, 48));
 		this.dynamic = true;
 		this.friction = 0;
 		this.bounce = 0;
