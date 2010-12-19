@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS `nodes` (
  
  
 header('Content-type: text/xml; charset=UTF-8');
+echo '<?xml version="1.0" encoding="utf-8"?>';
 
 // Connect to MySQL Server
 $mysql = @mysql_pconnect(MYSQL_ADDR.':'.MYSQL_POST, MYSQL_USER, MYSQL_PASS);
