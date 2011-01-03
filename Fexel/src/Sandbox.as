@@ -75,7 +75,7 @@ package
 			world.setCollider(new SAT());
 			view = new View(stage.stageWidth, stage.stageHeight);
 			//view.debug = View.DEBUG_ENTITY | View.DEBUG_SHAPE | View.DEBUG_VELOCITY;
-			view.debug = View.DEBUG_SHAPE;
+			view.debug = View.DEBUG_SHAPE  | View.DEBUG_VELOCITY;
 			world.addView(view);
 			this.addChildAt(view.getBuffer(), 0);
 			
@@ -90,7 +90,7 @@ package
 			yoshi.setShape(new Circle(26, 30, 16));
 			//yoshi.setShape(new Box(0, 0, 48, 48));
 			yoshi.dynamic = true;
-			yoshi.friction = 0;
+			yoshi.friction = 1;
 			yoshi.bounce = 0;
 			yoshi.mass = 1000;
 			yoshi.x = stage.stageWidth / 2
@@ -269,7 +269,7 @@ class Yoshi extends AnimatedSprite
 			if (jump)
 				this.velocity.y -= FastMath.min(v.y > 0 ? stepMove : stepMove - FastMath.abs(v.y), stepMove);
 			
-			if (velocity.length() < 0.1)
+			if (this.velocity.length() < 0.1)
 				anim = "idle"+anim;
 			else
 				anim = "run"+anim;
@@ -289,13 +289,10 @@ class Yoshi extends AnimatedSprite
 	protected var grounded:Boolean = false;
 	protected var groundEntity:Entity;
 	
-	protected function handleGround (e:Entity, point:Vec2D):void
+	protected function handleGround (e:Entity, c:ContactInfo):void
 	{
-		var gravity:Vec2D = this.getWorld().gravity.copy(),
-			pos:Vec2D = this.getPosition(),
-			center:Vec2D = this.getShape().getCenter();
-		center.add(pos.x, pos.y);
-		if (gravity.normalize().angleBetween(point.copy().subtractVec(center).normalize(), true) < 30)
+		var gravity:Vec2D = this.getWorld().gravity.copy().normalize().negate();
+		if (gravity.angleBetween(c.normal, true) < 60)
 		{
 			this.grounded = true;
 			this.groundEntity = e;
@@ -304,12 +301,12 @@ class Yoshi extends AnimatedSprite
 	
 	override public function handlerNewContact(e:Entity, c:ContactInfo):void
 	{
-		this.handleGround(e, c.point);
+		this.handleGround(e, c);
 	}
 	
 	override public function handlerPersistingContact(e:Entity, c:ContactInfo):void
 	{
-		this.handleGround(e, c.point);
+		this.handleGround(e, c);
 	}
 	
 	override public function handlerDeadContact(e:Entity):void

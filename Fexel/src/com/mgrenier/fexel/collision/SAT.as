@@ -136,8 +136,8 @@ package com.mgrenier.fexel.collision
 			info.separation = info.normal.copy().multiply(info.distance);
 			
 			// Determine point of impact
-			if (!shapeA.pointFromSegmentsCrossing(shapeA, offsetA, shapeB, offsetB, info, segments))
-				shapeB.pointFromSegmentsCrossing(shapeB, offsetB, shapeA, offsetA, info, segments);
+			//if (!shapeA.pointFromSegmentsCrossing(shapeA, offsetA, shapeB, offsetB, info, segments))
+			//	shapeB.pointFromSegmentsCrossing(shapeB, offsetB, shapeA, offsetA, info, segments);
 			
 			return info;
 		}
