@@ -69,7 +69,7 @@ if (!$db) {
 @mysql_query(sprintf("DELETE FROM `nodes` WHERE DATE_ADD(FROM_UNIXTIME(updated), INTERVAL 10 MINUTE) < NOW()"), $mysql);
 
 $networkid = NULL;
-if (strlen(@$_POST['netid']) != 64) {
+if (strlen(mysql_real_escape_string(@$_POST['netid'])) != 64) {
 	echo '<result><error code="NETWORKID_NOT_VALID" /></result>';
 	@mysql_close($mysql);
 	die();
@@ -141,7 +141,7 @@ switch (@$_POST['method']) {
 			break;
 		}
 		
-		$result = @mysql_query(sprintf("UPDATE `nodes` SET updated = UNIX_TIMESTAMP() WHERE id = '%s' AND networkid = %d LIMIT 1", $_POST['id'], $networkid), $mysql);
+		$result = @mysql_query(sprintf("UPDATE `nodes` SET updated = UNIX_TIMESTAMP() WHERE id = '%s' AND networkid = %d LIMIT 1", mysql_real_escape_string($_POST['id']), $networkid), $mysql);
 		if (!$result) {
 			echo '<error code="IDENTIFICATION_NOT_VALID" />';
 		} else {
@@ -179,7 +179,7 @@ switch (@$_POST['method']) {
 			break;
 		}
 		
-		$result = @mysql_query(sprintf("SELECT id, label, updated, ip FROM `nodes` WHERE label = '%s' AND networkid = %d LIMIT 1", $_POST['label'], $networkid), $mysql);
+		$result = @mysql_query(sprintf("SELECT id, label, updated, ip FROM `nodes` WHERE label = '%s' AND networkid = %d LIMIT 1", mysql_real_escape_string($_POST['label']), $networkid), $mysql);
 		if ($result) {
 			
 			while ($row = mysql_fetch_assoc($result)) {
