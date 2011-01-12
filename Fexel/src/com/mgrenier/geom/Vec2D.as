@@ -2,8 +2,6 @@ package com.mgrenier.geom
 {
 	import apparat.math.FastMath;
 	
-	import com.mgrenier.utils.IPool;
-	
 	import flash.geom.Point;
 	import flash.utils.getQualifiedClassName;
 	
@@ -12,7 +10,7 @@ package com.mgrenier.geom
 	 * 
 	 * @author Michael Grenier
 	 */
-	public class Vec2D implements IPool
+	public class Vec2D
 	{
 		static public var zero:Vec2D = new Vec2D();
 		

@@ -1,7 +1,5 @@
 package com.mgrenier.geom 
 {
-	import com.mgrenier.utils.IPool;
-	
 	import flash.geom.Rectangle;
 	import flash.utils.getQualifiedClassName;
 	
@@ -11,7 +9,7 @@ package com.mgrenier.geom
 	 * 
 	 * @author Michael Grenier
 	 */
-	public class Rectangle2D implements IPool
+	public class Rectangle2D
 	{
 		static public var zero:Rectangle2D = new Rectangle2D();
 		
