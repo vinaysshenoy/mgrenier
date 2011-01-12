@@ -4,7 +4,9 @@ package com.mgrenier.fexel.display
 	use namespace fexel;
 	
 	import com.mgrenier.utils.Disposable;
-	import com.mgrenier.fexel.Stage;
+	
+	import flash.display.BitmapData;
+	import flash.geom.Matrix;
 	
 	/**
 	 * Entities container
@@ -36,6 +38,26 @@ package com.mgrenier.fexel.display
 				c = null;
 			}
 			this.childs = null;
+		}
+		
+		/**
+		 * Render to buffer
+		 */
+		override fexel function render (buffer:BitmapData, transformation:Matrix):void
+		{
+			var i:int,
+				n:int,
+				matrix:Matrix = transformation.clone(),
+				c:DisplayObject;
+			matrix.transformPoint(this.transformationPoint.point);
+			matrix.translate(this.x, this.y);
+			matrix.scale(this.scaleX, this.scaleY);
+			
+			for (i = 0, n = this.childs.length; i < n; ++i)
+			{
+				c = this.childs[i];
+				c.render(buffer, matrix);
+			}
 		}
 		
 		/**
