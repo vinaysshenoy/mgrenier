@@ -3,7 +3,7 @@ package
 	import apparat.math.FastMath;
 	
 	import com.mgrenier.events.ConsoleEvent;
-	import com.mgrenier.fexel.World;
+	import com.mgrenier.fexel.Stage;
 	import com.mgrenier.fexel.display.View;
 	import com.mgrenier.utils.Console;
 	import com.mgrenier.utils.Input;
@@ -57,9 +57,11 @@ package
 		{
 			
 			var view:View = new View(100, 100, 500, 500);
-			trace(view, view.getCenter());
+			trace(view, view.getFieldOfView(), view.getCenter());
 			view.zoom = 0.5;
-			trace(view.getFieldOfView(), view.getCenter());
+			trace(view, view.getFieldOfView(), view.getCenter());
+			view.zoom = 2;
+			trace(view, view.getFieldOfView(), view.getCenter());
 			
 			
 			

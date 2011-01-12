@@ -1,18 +1,19 @@
 package com.mgrenier.fexel
 {
 	import com.mgrenier.fexel.display.View;
+	import com.mgrenier.fexel.display.DisplayObjectContainer;
 	import com.mgrenier.utils.Disposable;
 
-	public class World extends EntitiesContainer implements Disposable
+	public class Stage extends DisplayObjectContainer implements Disposable
 	{
 		protected var views:Vector.<View>;
 		
 		/**
-		 * World
+		 * Stage
 		 * 
 		 * 
 		 */
-		public function World()
+		public function Stage()
 		{
 			this.views = new Vector.<View>();
 		}
