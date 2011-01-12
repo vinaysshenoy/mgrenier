@@ -41,7 +41,7 @@ package com.mgrenier.fexel
 		 * 
 		 * @return
 		 */
-		public function getEntities():Vector.<Entity>
+		public function getEntities ():Vector.<Entity>
 		{
 			return this.entities;
 		}
@@ -107,41 +107,6 @@ package com.mgrenier.fexel
 				this.entities.splice(i2 - 1, 0, this.entities.splice(i1, 1, this.entities.splice(i2, 1)));
 			else
 				this.entities.splice(i1 - 1, 0, this.entities.splice(i2, 1, this.entities.splice(i1, 1)));
-			
-			return this;
-		}
-		
-		/**
-		 * Set World
-		 * 
-		 * @param	w
-		 * @return
-		 */
-		final internal function setWorld (w:World):EntitiesContainer
-		{
-			this.world = w;
-			
-			return this;
-		}
-		
-		/**
-		 * Get World
-		 * 
-		 * @return
-		 */
-		final internal function getWorld ():World
-		{
-			return this.world;
-		}
-		
-		/**
-		 * Remove World
-		 * 
-		 * @return
-		 */
-		final internal function removeWorld ():EntitiesContainer
-		{
-			this.world = null;
 			
 			return this;
 		}
