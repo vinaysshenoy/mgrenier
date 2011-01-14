@@ -7,9 +7,12 @@ package com.mgrenier.fexel.display
 	
 	import flash.display.BitmapData;
 	import flash.geom.Matrix;
+	import flash.geom.Point;
 	
 	/**
-	 * Entities container
+	 * Display Object Container
+	 * 
+	 * @author Michael Grenier
 	 */
 	public class DisplayObjectContainer extends DisplayObject
 	{
@@ -38,6 +41,8 @@ package com.mgrenier.fexel.display
 				c = null;
 			}
 			this.childs = null;
+			
+			super.dispose();
 		}
 		
 		/**
@@ -47,11 +52,10 @@ package com.mgrenier.fexel.display
 		{
 			var i:int,
 				n:int,
-				matrix:Matrix = transformation.clone(),
+				matrix:Matrix = this.getMatrix().clone(),
 				c:DisplayObject;
-			matrix.transformPoint(this.transformationPoint.point);
-			matrix.translate(this.x, this.y);
-			matrix.scale(this.scaleX, this.scaleY);
+			matrix.translate(-this.refX, -this.refY);
+			matrix.concat(transformation);
 			
 			for (i = 0, n = this.childs.length; i < n; ++i)
 			{
@@ -65,7 +69,7 @@ package com.mgrenier.fexel.display
 		 * 
 		 * @return
 		 */
-		public function getChilds ():Vector.<DisplayObject>
+		public function children ():Vector.<DisplayObject>
 		{
 			return this.childs;
 		}
@@ -78,6 +82,7 @@ package com.mgrenier.fexel.display
 		 */
 		public function addChild (c:DisplayObject):DisplayObject
 		{
+			c.setParent(this);
 			this.childs.push(c);
 			return c;
 		}
@@ -102,7 +107,10 @@ package com.mgrenier.fexel.display
 		public function removeChildAt (i:int):DisplayObject
 		{
 			var splice:Vector.<DisplayObject> = this.childs.splice(i, 1);
-			return splice.length == 0 ? null : splice[0];
+			if (splice.length == 0)
+				return null;
+			splice[0].setParent(null);
+			return splice[0];
 		}
 		
 		/**
@@ -110,8 +118,8 @@ package com.mgrenier.fexel.display
 		 */
 		public function removeAllChilds ():DisplayObjectContainer
 		{
-			//for (var n:int = this.childs.length - 1; n >= 0; n--)
-			//	this.removeChild(this.childs[n]);
+			for (var n:int = this.childs.length - 1; n >= 0; n--)
+				this.childs[n].setParent(null);
 			this.childs = new Vector.<DisplayObject>();
 			return this;
 		}

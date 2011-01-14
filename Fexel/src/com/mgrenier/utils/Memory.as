@@ -1,5 +1,6 @@
 package com.mgrenier.utils
 {
+	import flash.net.LocalConnection;
 	import flash.system.System;
 
 	public class Memory

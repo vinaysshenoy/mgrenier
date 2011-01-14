@@ -7,10 +7,14 @@ package com.mgrenier.fexel.display
 	import flash.display.BitmapData;
 	import flash.geom.Matrix;
 	
+	/**
+	 * View of the Stage
+	 * 
+	 * @author Michael Grenier
+	 */
 	public class View extends Rectangle2D implements Disposable
 	{
 		public var fill:uint;
-		public var transparent:Boolean;
 		public var zoom:Number;
 		public var dirty:Boolean;
 		
@@ -24,7 +28,7 @@ package com.mgrenier.fexel.display
 		/**
 		 * Constructor
 		 */
-		public function View(x:Number=0, y:Number=0, width:Number=0, height:Number=0, zoom:Number = 1, fill:uint = 0x00000000)
+		public function View(x:Number=0, y:Number=0, width:Number=0, height:Number=0, zoom:Number = 1, fill:uint = 0xff000000)
 		{
 			super(x, y, width, height);
 			this.zoom = zoom;
@@ -40,7 +44,14 @@ package com.mgrenier.fexel.display
 		 */
 		public function dispose ():void
 		{
-			
+			if (this.zoomBuffer)
+				this.zoomBuffer.dispose();
+			this.zoomBuffer = null;
+			this.zoomMatrix = null;
+			if (this.buffer)
+				this.buffer.dispose();
+			this.buffer = null;
+			this.dirtyInfo = null;
 		}
 		
 		/**
@@ -50,7 +61,7 @@ package com.mgrenier.fexel.display
 		public function render ():void
 		{
 			var fov:Rectangle2D = this.getFieldOfView(),
-				transparent:Boolean = this.fill >>> 24 != 0,
+				transparent:Boolean = this.fill >>> 24 != 255,
 				dirtr:Boolean = this.dirty ||
 								!this.dirtyInfo ||
 								this.dirtyInfo.width != fov.width ||
