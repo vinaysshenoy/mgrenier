@@ -26,8 +26,9 @@ package
 	import flash.geom.Matrix;
 	import flash.geom.ColorTransform;
 	import flash.utils.getTimer;
+	import flash.display.BlendMode;
 	
-	[SWF(backgroundColor="#ff00ff", frameRate="30", width="800", height="800")]
+	[SWF(backgroundColor="#000000", frameRate="30", width="400", height="400")]
 	public class Sandbox extends Sprite
 	{
 		protected var params:Object;
@@ -86,27 +87,43 @@ package
 			bitmap.bitmapData = buffer;
 			addChild(bitmap);
 			
-			t.x = stage.stageWidth / 2 - t.width / 2;
-			t.y = stage.stage.height / 2 - t.height / 2;
+			t.scaleX = t.scaleY = 0.5;
+			t.x = t.y = stage.stageWidth / 2 - t.width / 2;
 			t.refX = t.refY = t.width / 2;
-			
-			trace(540 % 360);
 			
 			this.addEventListener(Event.ENTER_FRAME, this.enterFrame);
 		}
 		
 		protected var matrix:Matrix = new Matrix(),
-					  color:ColorTransform = new ColorTransform();
+					  color:ColorTransform = new ColorTransform(),
+					  blend:Vector.<String> = new <String>[BlendMode.ADD, BlendMode.ALPHA, BlendMode.DARKEN, BlendMode.DIFFERENCE, BlendMode.ERASE, BlendMode.HARDLIGHT, BlendMode.INVERT, BlendMode.LAYER, BlendMode.LIGHTEN, BlendMode.MULTIPLY, BlendMode.NORMAL, BlendMode.OVERLAY, BlendMode.SCREEN, BlendMode.SHADER, BlendMode.SUBTRACT];
 		
 		protected function enterFrame (e:Event = null):void
 		{
 			buffer.lock();
 			
-			for (var i = 10; i > 0; --i) {
-				t.color.color = Math.random() * 0xffffff;
-				t.rotation += 5;
+			for (var i = 5; i > 0; --i) {
+				t.color.color = Math.random() * -0xffffff;
+				t.color.redMultiplier = t.color.greenMultiplier = t.color.blueMultiplier = t.color.alphaMultiplier = 0.2 + Math.random();
+				t.blend = this.blend[Math.floor(Math.random() * this.blend.length)];
+				t.rotation += 1;
 				t.render(buffer, matrix, color);
 			}
+			
+			t.x = -440;
+			t.y = 0;
+			t.scaleX = t.scaleY = 1;
+			var r:Number = t.rotation;
+			var a:Number = t.color.alphaMultiplier;
+			var b:String = t.blend;
+			t.rotation = 0;
+			t.color.alphaMultiplier = 1;
+			t.blend = BlendMode.NORMAL;
+			t.render(buffer, matrix, color);
+			t.scaleX = t.scaleY = 0.5;
+			t.x = t.y = stage.stageWidth / 2 - t.width / 2;
+			t.rotation = r;
+			t.color.alphaMultiplier = a;
 			
 			buffer.unlock();
 		}

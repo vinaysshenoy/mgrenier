@@ -93,8 +93,8 @@ package com.mgrenier.fexel.display
 				this._matrix = this._matrix || new Matrix();
 				this._matrix.identity();
 				this._matrix.rotate((this.rotation % 360) * 0.0174532925);
-				this._matrix.translate(this.x, this.y);
 				this._matrix.scale(this.scaleX, this.scaleY);
+				this._matrix.translate(this.x, this.y);
 				
 				this._oldTransformation = {
 					'x': this.x,
