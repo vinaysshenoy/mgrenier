@@ -79,7 +79,7 @@ package
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			
-			b = new Text(200, "Hello World", 20, 0xffffff, 0xff00ff, 0, 20)
+			b = new Text(200, "Hello World", 20, 0xffffff, 0xff00ff, 4, 4)
 			//b = new com.mgrenier.fexel.display.AnimatedSpriteSheet(48, 48, 12);
 			//b.spriteData = TextureLoader.load("yoshi", this.yoshi);
 			//b.addAnimation("runRight", new <int>[21, 22, 23, 24], true);
@@ -133,7 +133,7 @@ package
 				//t.colorTransform.redMultiplier = t.colorTransform.greenMultiplier = t.colorTransform.blueMultiplier = t.colorTransform.alphaMultiplier = Math.max(0.8, Math.random());
 				//t.blend = this.blend[Math.floor(Math.random() * this.blend.length)];
 				t.render(buffer, matrix, color);
-				//t.rotation += 2;
+				t.rotation += 2;
 				
 				//b.color.color = Math.random() * -0xffffff;
 				//b.color.redMultiplier = b.color.greenMultiplier = b.color.blueMultiplier = b.color.alphaMultiplier = 0.2 + Math.random();

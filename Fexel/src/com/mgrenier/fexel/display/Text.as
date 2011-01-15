@@ -92,6 +92,9 @@ package com.mgrenier.fexel.display
 			this.bitmapData = null;
 			this.bitmapData = new BitmapData(this.textField.width + this.shadowX, this.textField.height + this.shadowY, true, 0x00000000);
 			
+			//this.width = this.bitmapData.width;
+			//this.height = this.bitmapData.height;
+			
 			this._matrix.tx = this._matrix.ty = 0;
 			if (this.shadowX != 0 || this.shadowY != 0)
 			{
