@@ -105,6 +105,8 @@ package com.mgrenier.fexel.display
 			}
 			
 			this.bitmapData.draw(this.textField, this._matrix);
+			
+			super.update(rate);
 		}
 	}
 }
