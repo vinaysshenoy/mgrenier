@@ -1,14 +1,10 @@
 package com.mgrenier.fexel.display
 {
-	import com.mgrenier.fexel.fexel;
-	
 	import flash.display.BitmapData;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.utils.Dictionary;
 
-	use namespace fexel;
-	
 	/**
 	 * AnimatedSpriteSheet
 	 * 
@@ -131,12 +127,11 @@ package com.mgrenier.fexel.display
 		}
 		
 		/**
-		 * Render to buffer
+		 * Update buffer
 		 * 
-		 * @param	buffer
-		 * @param	transformation
+		 * @param	rate
 		 */
-		override fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform, rate:int):void
+		override public function update (rate:int):void
 		{
 			if (this._playing && this.currentAnimation != "" && this.animations[this.currentAnimation])
 			{
@@ -164,9 +159,8 @@ package com.mgrenier.fexel.display
 				}
 			}
 			
-			super.render(buffer, matrix, color, rate);
+			super.update(rate);
 		}
-		
 	}
 }
 

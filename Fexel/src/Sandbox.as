@@ -23,8 +23,11 @@ package
 	import flash.utils.getTimer;
 	import flash.display.BlendMode;
 	import com.mgrenier.fexel.display.SpriteSheet;
+	import flash.filters.BlurFilter;
+	import flash.geom.Rectangle;
+	import flash.geom.Point;
 	
-	[SWF(backgroundColor="#000000", frameRate="30", width="400", height="400")]
+	[SWF(backgroundColor="#000000", frameRate="30", width="800", height="800")]
 	public class Sandbox extends Sprite
 	{
 		protected var params:Object;
@@ -68,7 +71,7 @@ package
 		protected var yoshi:Class;
 		
 		public var buffer:BitmapData;
-		public var b:com.mgrenier.fexel.display.AnimatedSpriteSheet;
+		public var b:com.mgrenier.fexel.display.Bitmap;
 		public var t:com.mgrenier.fexel.display.TiledBitmap;
 		
 		protected function initialize ():void
@@ -76,10 +79,11 @@ package
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			
-			b = new com.mgrenier.fexel.display.AnimatedSpriteSheet(48, 48, 12);
-			b.spriteData = TextureLoader.load("yoshi", this.yoshi);
-			b.addAnimation("runRight", new <int>[21, 22, 23, 24], true);
-			b.play("runRight");
+			b = new Text(200, "Hello World", 20, 0xffffff, 0xff00ff, 0, 20)
+			//b = new com.mgrenier.fexel.display.AnimatedSpriteSheet(48, 48, 12);
+			//b.spriteData = TextureLoader.load("yoshi", this.yoshi);
+			//b.addAnimation("runRight", new <int>[21, 22, 23, 24], true);
+			//b.play("runRight");
 			
 			t = new com.mgrenier.fexel.display.TiledBitmap(stage.stageWidth, stage.stageHeight);
 			t.bitmap = b;
@@ -94,14 +98,20 @@ package
 			b.refX = b.refY = b.width / 2;
 			
 			t.refX = t.refY = t.width / 2;
+			t.scaleX = t.scaleY = 0.6;
 			
+			b.update(30);
+			t.update(30);
 			
 			this.addEventListener(Event.ENTER_FRAME, this.enterFrame);
 		}
 		
+		protected var blur:BlurFilter = new BlurFilter(4, 4, 1);
+		
 		protected var matrix:Matrix = new Matrix(),
 					  color:ColorTransform = new ColorTransform(),
-					  blend:Vector.<String> = new <String>[BlendMode.ADD, BlendMode.ALPHA, BlendMode.DARKEN, BlendMode.DIFFERENCE, BlendMode.ERASE, BlendMode.HARDLIGHT, BlendMode.INVERT, BlendMode.LAYER, BlendMode.LIGHTEN, BlendMode.MULTIPLY, BlendMode.NORMAL, BlendMode.OVERLAY, BlendMode.SCREEN, BlendMode.SHADER, BlendMode.SUBTRACT];
+					  blend:Vector.<String> = new <String>[BlendMode.NORMAL];
+					  //blend:Vector.<String> = new <String>[BlendMode.ADD, BlendMode.ALPHA, BlendMode.DARKEN, BlendMode.DIFFERENCE, BlendMode.ERASE, BlendMode.HARDLIGHT, BlendMode.INVERT, BlendMode.LAYER, BlendMode.LIGHTEN, BlendMode.MULTIPLY, BlendMode.NORMAL, BlendMode.OVERLAY, BlendMode.SCREEN, BlendMode.SHADER, BlendMode.SUBTRACT];
 		
 		protected function enterFrame (e:Event = null):void
 		{
@@ -109,11 +119,22 @@ package
 			
 			var timer:int;
 			
-			b.render(null, null, null, 30);
-			t.render(buffer, matrix, color, 30);
-			t.rotation += 2;
+			if (Input.keyState(Input.SPACE))
+				Memory.forceGC();
 			
+			if (Input.mouseState)
+			{
+				b.update(30);
+				t.update(30);
+			}
 			for (var i = 1; i > 0; --i) {
+				
+				//t.colorTransform.color = Math.random() * -0xffffff;
+				//t.colorTransform.redMultiplier = t.colorTransform.greenMultiplier = t.colorTransform.blueMultiplier = t.colorTransform.alphaMultiplier = Math.max(0.8, Math.random());
+				//t.blend = this.blend[Math.floor(Math.random() * this.blend.length)];
+				t.render(buffer, matrix, color);
+				//t.rotation += 2;
+				
 				//b.color.color = Math.random() * -0xffffff;
 				//b.color.redMultiplier = b.color.greenMultiplier = b.color.blueMultiplier = b.color.alphaMultiplier = 0.2 + Math.random();
 				//b.blend = this.blend[Math.floor(Math.random() * this.blend.length)];
@@ -138,6 +159,8 @@ package
 			b.x = b.y = stage.stageWidth / 2 - b.width / 2;
 			b.rotation = r;
 			b.color.alphaMultiplier = a;*/
+			
+			//buffer.applyFilter(buffer, new Rectangle(0, 0, buffer.width, buffer.height), new Point(0, 0), blur);
 			
 			buffer.unlock();
 		}

@@ -80,7 +80,31 @@ package com.mgrenier.fexel.display
 				this.bitmapData.dispose();
 			this.bitmapData = null;
 			
+			this._sourceRect = null;
+			this._destPoint = null;
+			
+			if (this._maskData)
+				this._maskData.dispose();
+			this._maskData = null;
+			
+			if (this._combinedData)
+				this._combinedData.dispose();
+			this._combinedData = null;
+			
+			this._matrix = null;
+			this._color = null;
+			
 			super.dispose();
+		}
+		
+		/**
+		 * Update buffer
+		 * 
+		 * @param	rate
+		 */
+		override public function update (rate:int):void
+		{
+			super.update(rate);
 		}
 		
 		/**
@@ -91,9 +115,9 @@ package com.mgrenier.fexel.display
 		 * @param	color
 		 * @param	rate
 		 */
-		override fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform, rate:int):void
+		override fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform):void
 		{
-			if (!this.bitmapData || !buffer)
+			if (!this.bitmapData)
 				return;
 			
 			this._matrix.a = matrix.a;
@@ -115,7 +139,7 @@ package com.mgrenier.fexel.display
 			this._matrix.translate(-this.refX, -this.refY);
 			this._matrix.concat(this.getMatrix());
 			this._matrix.translate(this.refX, this.refY);
-			this._color.concat(this.color);
+			this._color.concat(this.colorTransform);
 			
 			this._sourceRect.width = this.bitmapData.width;
 			this._sourceRect.height = this.bitmapData.height;
@@ -137,6 +161,8 @@ package com.mgrenier.fexel.display
 			{
 				buffer.copyPixels(drawData, this._sourceRect, this._destPoint, null, null, this.transparent);
 			}
+			
+			super.render(buffer, matrix, color);
 		}
 	}
 }

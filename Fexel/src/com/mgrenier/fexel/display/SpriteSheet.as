@@ -1,8 +1,5 @@
 package com.mgrenier.fexel.display
 {
-	import com.mgrenier.fexel.fexel;
-	use namespace fexel;
-	
 	import flash.display.BitmapData;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -47,19 +44,17 @@ package com.mgrenier.fexel.display
 				this.spriteData.dispose();
 			this.spriteData = null;
 			this._sourceRect = null;
+			this._destPoint = null;
 			
 			super.dispose();
 		}
 		
 		/**
-		 * Render to buffer
+		 * Update buffer
 		 * 
-		 * @param	buffer
-		 * @param	transformation
-		 * @param	color
 		 * @param	rate
 		 */
-		override fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform, rate:int):void
+		override public function update (rate:int):void
 		{
 			if (!this.spriteData)
 				return;
@@ -74,7 +69,7 @@ package com.mgrenier.fexel.display
 			
 			this.bitmapData.copyPixels(this.spriteData, this._sourceRect, this._destPoint, null, null, false);
 			
-			super.render(buffer, matrix, color, rate);
+			super.update(rate);
 		}
 	}
 }

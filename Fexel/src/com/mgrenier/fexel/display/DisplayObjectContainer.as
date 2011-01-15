@@ -46,6 +46,23 @@ package com.mgrenier.fexel.display
 		}
 		
 		/**
+		 * Update buffer
+		 * 
+		 * @param	rate
+		 */
+		override public function update (rate:int):void
+		{
+			var i:int,
+				n:int;
+			
+			for (i = 0, n = this.childs.length; i < n; ++i)
+			{
+				c = this.childs[i];
+				c.update(rate);
+			}
+		}
+		
+		/**
 		 * Render to buffer
 		 * 
 		 * @param	buffer
@@ -53,7 +70,7 @@ package com.mgrenier.fexel.display
 		 * @param	color
 		 * @param	rate
 		 */
-		override fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform, rate:int):void
+		override fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform):void
 		{
 			var i:int,
 				n:int,
@@ -65,7 +82,7 @@ package com.mgrenier.fexel.display
 			for (i = 0, n = this.childs.length; i < n; ++i)
 			{
 				c = this.childs[i];
-				c.render(buffer, matrix);
+				c.render(buffer, matrix, color);
 			}
 		}
 		

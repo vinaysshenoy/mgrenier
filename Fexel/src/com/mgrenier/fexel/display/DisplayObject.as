@@ -27,7 +27,7 @@ package com.mgrenier.fexel.display
 		public var refX:Number;
 		public var refY:Number;
 		public var blend:String;
-		public var color:ColorTransform;
+		public var colorTransform:ColorTransform;
 		
 		
 		private var _parent:DisplayObject;
@@ -47,7 +47,7 @@ package com.mgrenier.fexel.display
 			this.scaleX = this.scaleY = 1;
 			this.refX = this.refY = 0;
 			this.blend = BlendMode.NORMAL;
-			this.color = new ColorTransform();
+			this.colorTransform = new ColorTransform();
 		}
 		
 		/**
@@ -56,8 +56,18 @@ package com.mgrenier.fexel.display
 		public function dispose ():void
 		{
 			this._parent = null;
+			this.colorTransform = null;
 			this._oldTransformation = null;
 			this._matrix = null;
+		}
+		
+		/**
+		 * Update buffer
+		 * 
+		 * @param	rate
+		 */
+		public function update (rate:int):void
+		{
 		}
 		
 		/**
@@ -68,9 +78,8 @@ package com.mgrenier.fexel.display
 		 * @param	color
 		 * @param	rate
 		 */
-		fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform, rate:int):void
+		fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform):void
 		{
-			throw new Error(this +" : Must be instanciated");
 		}
 		
 		/**

@@ -1,8 +1,5 @@
 package com.mgrenier.fexel.display
 {
-	import com.mgrenier.fexel.fexel;
-	use namespace fexel;
-	
 	import flash.display.BitmapData;
 	import flash.geom.Matrix;
 	import flash.geom.ColorTransform;
@@ -43,14 +40,11 @@ package com.mgrenier.fexel.display
 		}
 		
 		/**
-		 * Render to buffer
+		 * Update buffer
 		 * 
-		 * @param	buffer
-		 * @param	transformation
-		 * @param	color
 		 * @param	rate
 		 */
-		override fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform, rate:int):void
+		override public function update (rate:int):void
 		{
 			if (!this.bitmap)
 				return;
@@ -63,7 +57,7 @@ package com.mgrenier.fexel.display
 			
 			this.bitmapData.draw(tiling, this._matrix, null, null, null, this.smooth);
 			
-			super.render(buffer, matrix, color, rate);
+			super.update(rate);
 		}
 	}
 }
