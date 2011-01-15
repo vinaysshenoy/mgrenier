@@ -5,15 +5,10 @@ package
 	import com.mgrenier.fexel.fexel;
 	use namespace fexel;
 	
-	import com.mgrenier.events.ConsoleEvent;
-	import com.mgrenier.fexel.Stage;
-	import com.mgrenier.fexel.TextureLoader;
-	import com.mgrenier.fexel.display.Bitmap;
-	import com.mgrenier.fexel.display.DisplayObject;
-	import com.mgrenier.fexel.display.View;
-	import com.mgrenier.utils.Console;
-	import com.mgrenier.utils.Input;
-	import com.mgrenier.utils.Memory;
+	import com.mgrenier.events.*;
+	import com.mgrenier.fexel.*;
+	import com.mgrenier.fexel.display.*;
+	import com.mgrenier.utils.*;
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -27,6 +22,7 @@ package
 	import flash.geom.ColorTransform;
 	import flash.utils.getTimer;
 	import flash.display.BlendMode;
+	import com.mgrenier.fexel.display.SpriteSheet;
 	
 	[SWF(backgroundColor="#000000", frameRate="30", width="400", height="400")]
 	public class Sandbox extends Sprite
@@ -72,24 +68,33 @@ package
 		protected var yoshi:Class;
 		
 		public var buffer:BitmapData;
-		public var t:com.mgrenier.fexel.display.Bitmap;
+		public var b:com.mgrenier.fexel.display.AnimatedSpriteSheet;
+		public var t:com.mgrenier.fexel.display.TiledBitmap;
 		
 		protected function initialize ():void
 		{
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			
-			t = new com.mgrenier.fexel.display.Bitmap(480, 480);
-			t.bitmapData = TextureLoader.load("yoshi", this.yoshi);
+			b = new com.mgrenier.fexel.display.AnimatedSpriteSheet(48, 48, 12);
+			b.spriteData = TextureLoader.load("yoshi", this.yoshi);
+			b.addAnimation("runRight", new <int>[21, 22, 23, 24], true);
+			b.play("runRight");
+			
+			t = new com.mgrenier.fexel.display.TiledBitmap(stage.stageWidth, stage.stageHeight);
+			t.bitmap = b;
 			
 			buffer = new BitmapData(stage.stageWidth, stage.stageHeight, true, 0xff000000);
 			var bitmap:flash.display.Bitmap = new flash.display.Bitmap();
 			bitmap.bitmapData = buffer;
 			addChild(bitmap);
 			
-			t.scaleX = t.scaleY = 0.5;
-			t.x = t.y = stage.stageWidth / 2 - t.width / 2;
+			b.scaleX = b.scaleY = 1;
+			b.x = b.y = stage.stageWidth / 2 - b.width / 2;
+			b.refX = b.refY = b.width / 2;
+			
 			t.refX = t.refY = t.width / 2;
+			
 			
 			this.addEventListener(Event.ENTER_FRAME, this.enterFrame);
 		}
@@ -102,28 +107,37 @@ package
 		{
 			buffer.lock();
 			
-			for (var i = 5; i > 0; --i) {
-				t.color.color = Math.random() * -0xffffff;
-				t.color.redMultiplier = t.color.greenMultiplier = t.color.blueMultiplier = t.color.alphaMultiplier = 0.2 + Math.random();
-				t.blend = this.blend[Math.floor(Math.random() * this.blend.length)];
-				t.rotation += 1;
-				t.render(buffer, matrix, color);
+			var timer:int;
+			
+			b.render(null, null, null, 30);
+			t.render(buffer, matrix, color, 30);
+			t.rotation += 2;
+			
+			for (var i = 1; i > 0; --i) {
+				//b.color.color = Math.random() * -0xffffff;
+				//b.color.redMultiplier = b.color.greenMultiplier = b.color.blueMultiplier = b.color.alphaMultiplier = 0.2 + Math.random();
+				//b.blend = this.blend[Math.floor(Math.random() * this.blend.length)];
+				//b.rotation += 2;
+				
+				//timer = getTimer();
+				//b.render(buffer, matrix, color, 30);
+				//trace(getTimer() - timer);
 			}
 			
-			t.x = -440;
-			t.y = 0;
-			t.scaleX = t.scaleY = 1;
-			var r:Number = t.rotation;
-			var a:Number = t.color.alphaMultiplier;
-			var b:String = t.blend;
-			t.rotation = 0;
-			t.color.alphaMultiplier = 1;
-			t.blend = BlendMode.NORMAL;
-			t.render(buffer, matrix, color);
-			t.scaleX = t.scaleY = 0.5;
-			t.x = t.y = stage.stageWidth / 2 - t.width / 2;
-			t.rotation = r;
-			t.color.alphaMultiplier = a;
+			/*b.x = -440;
+			b.y = 0;
+			b.scaleX = b.scaleY = 1;
+			var r:Number = b.rotation;
+			var a:Number = b.color.alphaMultiplier;
+			var b:String = b.blend;
+			b.rotation = 0;
+			b.color.alphaMultiplier = 1;
+			b.blend = BlendMode.NORMAL;
+			b.render(buffer, matrix, color);
+			b.scaleX = b.scaleY = 0.25;
+			b.x = b.y = stage.stageWidth / 2 - b.width / 2;
+			b.rotation = r;
+			b.color.alphaMultiplier = a;*/
 			
 			buffer.unlock();
 		}

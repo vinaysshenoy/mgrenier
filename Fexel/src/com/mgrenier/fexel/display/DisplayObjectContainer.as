@@ -47,8 +47,13 @@ package com.mgrenier.fexel.display
 		
 		/**
 		 * Render to buffer
+		 * 
+		 * @param	buffer
+		 * @param	transformation
+		 * @param	color
+		 * @param	rate
 		 */
-		override fexel function render (buffer:BitmapData, transformation:Matrix):void
+		override fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform, rate:int):void
 		{
 			var i:int,
 				n:int,

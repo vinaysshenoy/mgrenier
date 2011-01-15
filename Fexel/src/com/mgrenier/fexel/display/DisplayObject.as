@@ -65,8 +65,10 @@ package com.mgrenier.fexel.display
 		 * 
 		 * @param	buffer
 		 * @param	transformation
+		 * @param	color
+		 * @param	rate
 		 */
-		fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform):void
+		fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform, rate:int):void
 		{
 			throw new Error(this +" : Must be instanciated");
 		}
