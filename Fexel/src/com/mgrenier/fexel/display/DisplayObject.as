@@ -66,7 +66,7 @@ package com.mgrenier.fexel.display
 		 * 
 		 * @param	rate
 		 */
-		public function update (rate:int):void
+		public function update (rate:int = 0):void
 		{
 		}
 		

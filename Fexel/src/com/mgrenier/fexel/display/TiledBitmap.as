@@ -35,6 +35,7 @@ package com.mgrenier.fexel.display
 				this.bitmap.dispose();
 				this.bitmap = null;
 			}
+			this._matrix = null;
 			
 			super.dispose();
 		}
@@ -44,7 +45,7 @@ package com.mgrenier.fexel.display
 		 * 
 		 * @param	rate
 		 */
-		override public function update (rate:int):void
+		override public function update (rate:int = 0):void
 		{
 			if (!this.bitmap)
 				return;

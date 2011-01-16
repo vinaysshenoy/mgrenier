@@ -71,7 +71,7 @@ package
 		protected var yoshi:Class;
 		
 		public var buffer:BitmapData;
-		public var b:com.mgrenier.fexel.display.Bitmap;
+		public var b:com.mgrenier.fexel.display.AnimatedSpriteSheet;
 		public var t:com.mgrenier.fexel.display.TiledBitmap;
 		
 		protected function initialize ():void
@@ -79,11 +79,15 @@ package
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			
-			b = new Text(200, "Hello World", 20, 0xffffff, 0xff00ff, 4, 4)
-			//b = new com.mgrenier.fexel.display.AnimatedSpriteSheet(48, 48, 12);
-			//b.spriteData = TextureLoader.load("yoshi", this.yoshi);
-			//b.addAnimation("runRight", new <int>[21, 22, 23, 24], true);
-			//b.play("runRight");
+			//b = new Text(300, "Hello World", 30, 0xbbbbbb, 0x330033, 4, 4)
+			/*b = new Shape(100, 100);
+			b.graphics.beginFill(0xff00ff);
+			b.graphics.drawCircle(50, 50, 50);
+			b.graphics.endFill();*/
+			b = new com.mgrenier.fexel.display.AnimatedSpriteSheet(48, 48, 12);
+			b.spriteData = TextureLoader.load("yoshi", this.yoshi);
+			b.addAnimation("runRight", new <int>[21, 22, 23, 24], true);
+			b.play("runRight");
 			
 			t = new com.mgrenier.fexel.display.TiledBitmap(stage.stageWidth, stage.stageHeight);
 			t.bitmap = b;
@@ -100,8 +104,8 @@ package
 			t.refX = t.refY = t.width / 2;
 			t.scaleX = t.scaleY = 0.6;
 			
-			b.update(30);
-			t.update(30);
+			b.update();
+			t.update();
 			
 			this.addEventListener(Event.ENTER_FRAME, this.enterFrame);
 		}

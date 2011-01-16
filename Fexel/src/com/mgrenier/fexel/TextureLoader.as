@@ -66,6 +66,8 @@ package com.mgrenier.fexel
 					object = null;
 					return BitmapData(TextureLoader.textures[id]);
 				}
+				else
+					object = null;
 			}
 			
 			return null;

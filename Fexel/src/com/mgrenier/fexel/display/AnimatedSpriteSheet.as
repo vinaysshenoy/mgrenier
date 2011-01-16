@@ -131,7 +131,7 @@ package com.mgrenier.fexel.display
 		 * 
 		 * @param	rate
 		 */
-		override public function update (rate:int):void
+		override public function update (rate:int = 0):void
 		{
 			if (this._playing && this.currentAnimation != "" && this.animations[this.currentAnimation])
 			{
@@ -155,7 +155,7 @@ package com.mgrenier.fexel.display
 						
 					}
 					this.cellIndex = anim.cells[currentFrame];
-					this._currentFrame += this.frameRate / rate;
+					this._currentFrame = (!isFinite(this._currentFrame) ? 0 : this._currentFrame) + this.frameRate / rate;
 				}
 			}
 			

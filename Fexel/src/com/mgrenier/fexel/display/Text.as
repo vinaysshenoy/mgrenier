@@ -60,7 +60,15 @@ package com.mgrenier.fexel.display
 		 */
 		override public function dispose ():void
 		{
+			this._matrix = null;
+			this._textFormat = null;
+			this._shadowTransform = null;
+			if (this._textData)
+				this._textData.dispose();
+			this._textData = null;
+			this.textField = null;
 			
+			super.dispose();
 		}
 		
 		/**
@@ -68,7 +76,7 @@ package com.mgrenier.fexel.display
 		 * 
 		 * @param	rate
 		 */
-		override public function update (rate:int):void
+		override public function update (rate:int = 0):void
 		{
 			this.textField.width = this.width;
 			this.textField.autoSize = TextFieldAutoSize.LEFT;

@@ -8,6 +8,7 @@ package com.mgrenier.fexel.display
 	import flash.display.BitmapData;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
+	import flash.geom.ColorTransform;
 	
 	/**
 	 * Display Object Container
@@ -18,6 +19,9 @@ package com.mgrenier.fexel.display
 	{
 		protected var childs:Vector.<DisplayObject>;
 		
+		private var _matrix:Matrix;
+		private var _color:ColorTransform;
+		
 		/**
 		 * Constructor
 		 */
@@ -26,6 +30,8 @@ package com.mgrenier.fexel.display
 			super();
 			
 			this.childs = new Vector.<DisplayObject>();
+			this._matrix = new Matrix();
+			this._color = new ColorTransform();
 		}
 		
 		/**
@@ -50,7 +56,7 @@ package com.mgrenier.fexel.display
 		 * 
 		 * @param	rate
 		 */
-		override public function update (rate:int):void
+		override public function update (rate:int = 0):void
 		{
 			var i:int,
 				n:int;
@@ -74,15 +80,34 @@ package com.mgrenier.fexel.display
 		{
 			var i:int,
 				n:int,
-				matrix:Matrix = this.getMatrix().clone(),
 				c:DisplayObject;
-			matrix.translate(-this.refX, -this.refY);
-			matrix.concat(transformation);
+			
+			this._matrix.a = matrix.a;
+			this._matrix.b = matrix.b;
+			this._matrix.c = matrix.c;
+			this._matrix.d = matrix.d;
+			this._matrix.tx = matrix.tx;
+			this._matrix.ty = matrix.ty;
+			
+			this._matrix.translate(-this.refX, -this.refY);
+			this._matrix.concat(this.getMatrix());
+			this._matrix.translate(this.refX, this.refY);
+			
+			this._color.alphaMultiplier = color.alphaMultiplier;
+			this._color.alphaOffset = color.alphaOffset;
+			this._color.redMultiplier = color.redMultiplier;
+			this._color.redOffset = color.redOffset;
+			this._color.greenMultiplier = color.greenMultiplier;
+			this._color.greenOffset = color.greenOffset;
+			this._color.blueMultiplier = color.blueMultiplier;
+			this._color.blueOffset = color.blueOffset;
+			
+			this._color.concat(this.colorTransform);
 			
 			for (i = 0, n = this.childs.length; i < n; ++i)
 			{
 				c = this.childs[i];
-				c.render(buffer, matrix, color);
+				c.render(buffer, this._matrix, this._color);
 			}
 		}
 		

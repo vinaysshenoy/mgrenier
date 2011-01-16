@@ -54,7 +54,7 @@ package com.mgrenier.fexel.display
 		 * 
 		 * @param	rate
 		 */
-		override public function update (rate:int):void
+		override public function update (rate:int = 0):void
 		{
 			if (!this.spriteData)
 				return;
