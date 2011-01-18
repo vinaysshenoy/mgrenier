@@ -30,11 +30,6 @@ package com.mgrenier.fexel.display
 		 */
 		override public function dispose ():void
 		{
-			if (this.bitmap)
-			{
-				this.bitmap.dispose();
-				this.bitmap = null;
-			}
 			this._matrix = null;
 			
 			super.dispose();
@@ -56,7 +51,9 @@ package com.mgrenier.fexel.display
 			tiling.graphics.drawRect(0, 0, this.bitmapData.width, this.bitmapData.height);
 			tiling.graphics.endFill();
 			
+			this.bitmapData.lock();
 			this.bitmapData.draw(tiling, this._matrix, null, null, null, this.smooth);
+			this.bitmapData.unlock();
 			
 			super.update(rate);
 		}

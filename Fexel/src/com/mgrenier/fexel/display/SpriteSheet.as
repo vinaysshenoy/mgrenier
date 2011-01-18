@@ -67,7 +67,9 @@ package com.mgrenier.fexel.display
 			this._sourceRect.x *= this.gridWidth;
 			this._sourceRect.y *= this.gridHeight;
 			
+			this.bitmapData.lock();
 			this.bitmapData.copyPixels(this.spriteData, this._sourceRect, this._destPoint, null, null, false);
+			this.bitmapData.unlock();
 			
 			super.update(rate);
 		}

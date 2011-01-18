@@ -10,6 +10,7 @@ package com.mgrenier.fexel.display
 	import flash.display.BlendMode;
 	import flash.geom.ColorTransform;
 	import flash.display.Sprite;
+	import com.mgrenier.geom.Rectangle2D;
 
 	/**
 	 * Bitmap
@@ -111,21 +112,24 @@ package com.mgrenier.fexel.display
 		 * Render to buffer
 		 * 
 		 * @param	buffer
+		 * @param	bounds
 		 * @param	transformation
 		 * @param	color
 		 * @param	rate
 		 */
-		override fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform):void
+		override fexel function render (buffer:BitmapData, bounds:Rectangle2D, matrix:Matrix, color:ColorTransform):void
 		{
 			if (!this.bitmapData)
 				return;
 			
-			this._matrix.a = matrix.a;
-			this._matrix.b = matrix.b;
-			this._matrix.c = matrix.c;
-			this._matrix.d = matrix.d;
-			this._matrix.tx = matrix.tx;
-			this._matrix.ty = matrix.ty;
+			var m:Matrix = this.getMatrix();
+			
+			this._matrix.a = m.a;
+			this._matrix.b = m.b;
+			this._matrix.c = m.c;
+			this._matrix.d = m.d;
+			this._matrix.tx = m.tx;
+			this._matrix.ty = m.ty;
 			this._color.alphaMultiplier = color.alphaMultiplier;
 			this._color.alphaOffset = color.alphaOffset;
 			this._color.blueMultiplier = color.blueMultiplier;
@@ -137,7 +141,8 @@ package com.mgrenier.fexel.display
 			
 			
 			this._matrix.translate(-this.refX, -this.refY);
-			this._matrix.concat(this.getMatrix());
+			//this._matrix.concat(this.getMatrix());
+			this._matrix.concat(matrix);
 			this._matrix.translate(this.refX, this.refY);
 			this._color.concat(this.colorTransform);
 			
@@ -162,7 +167,7 @@ package com.mgrenier.fexel.display
 				buffer.copyPixels(drawData, this._sourceRect, this._destPoint, null, null, this.transparent);
 			}
 			
-			super.render(buffer, matrix, color);
+			super.render(buffer, bounds, matrix, color);
 		}
 	}
 }

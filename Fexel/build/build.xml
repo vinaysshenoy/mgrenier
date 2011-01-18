@@ -54,7 +54,7 @@
 	</taskdef>
 	
 	<target name="clean">
-		<delete failonerror="false" file="${dir.bin}/Network2.swf"/>
+		<delete failonerror="false" file="${dir.bin}/Sandbox2.swf"/>
 	</target>
 	
     <target name="compile" depends="clean">
@@ -68,13 +68,13 @@
 			<arg line="-optimize"/>
 			<arg line="-debug=false"/>
 			<arg line="-static-link-runtime-shared-libraries"/>
-			<arg line="-o '${dir.bin}/Network2.swf'"/>
+			<arg line="-o '${dir.bin}/Sandbox2.swf'"/>
 			<arg line="-el '${flex.libs}/player/10.0/playerglobal.swc'"/>
 			<arg line="-library-path '${APPARAT_HOME}'"/>
 			<arg line="-sp '${dir.src}'"/>
-			<arg line="-- '${dir.src}/Network2.as'"/>
+			<arg line="-- '${dir.src}/Sandbox2.as'"/>
 		</exec>
-		<tdsi in="${dir.bin}/Network2.swf">
+		<tdsi in="${dir.bin}/Sandbox2.swf">
 		  <classpath refid="apparat.path"/>
 		</tdsi>
 	</target>

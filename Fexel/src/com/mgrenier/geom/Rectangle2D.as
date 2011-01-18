@@ -1,5 +1,9 @@
 package com.mgrenier.geom 
 {
+	import apparat.math.FastMath;
+	
+	import flash.geom.Matrix;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.getQualifiedClassName;
 	
@@ -190,6 +194,36 @@ package com.mgrenier.geom
 				this.top > r.top ? this.top : r.top,
 				this.left < r.left ? this.right - r.left : r.right - this.left,
 				this.top > r.top ? r.bottom - this.top : this.bottom - r.top
+			);
+		}
+		
+		/**
+		 * Get Bounds of this rectangle when Matrix is applied
+		 * 
+		 * @param	m
+		 * @return
+		 */
+		public function bounds (m:Matrix):Rectangle2D
+		{
+			var	upperleft:Point = m.transformPoint(new Point(this.x, this.y)),
+				upperright:Point = m.transformPoint(new Point(this.x + this.width, this.y)),
+				bottomleft:Point = m.transformPoint(new Point(this.x, this.y + this.height)),
+				bottomright:Point = m.transformPoint(new Point(this.x + this.width, this.y + this.height)),
+				left:Number = Number.MAX_VALUE,
+				right:Number = Number.MIN_VALUE,
+				top:Number = Number.MAX_VALUE,
+				bottom:Number = Number.MIN_VALUE,
+				
+			left = FastMath.min(upperleft.x, FastMath.min(upperright.x, FastMath.min(bottomleft.x, bottomright.x)));
+			right = FastMath.max(upperleft.x, FastMath.max(upperright.x, FastMath.max(bottomleft.x, bottomright.x)));
+			top = FastMath.min(upperleft.y, FastMath.min(upperright.y, FastMath.min(bottomleft.y, bottomright.y)));
+			bottom = FastMath.max(upperleft.y, FastMath.max(upperright.y, FastMath.max(bottomleft.y, bottomright.y)));
+			
+			return new Rectangle2D(
+				left,
+				top,
+				right - left,
+				bottom - top
 			);
 		}
 		

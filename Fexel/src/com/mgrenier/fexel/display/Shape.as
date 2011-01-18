@@ -50,8 +50,10 @@ package com.mgrenier.fexel.display
 		 */
 		override public function update (rate:int = 0):void
 		{
+			this.bitmapData.lock();
 			this.bitmapData.fillRect(this._sourceRect, this.transparent ? 0x00000000 : 0xff000000);
 			this.bitmapData.draw(this._shape);
+			this.bitmapData.unlock();
 			
 			super.update(rate);
 		}

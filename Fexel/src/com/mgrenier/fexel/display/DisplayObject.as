@@ -13,6 +13,7 @@ package com.mgrenier.fexel.display
 	import apparat.math.FastMath;
 	import flash.display.BlendMode;
 	import flash.geom.ColorTransform;
+	import com.mgrenier.fexel.Stage;
 	
 	/**
 	 * Display Object
@@ -34,6 +35,10 @@ package com.mgrenier.fexel.display
 		public function get parent ():DisplayObject { return this._parent; }
 		fexel function setParent (v:DisplayObject):void { this._parent = v; }
 		
+		private var _stage:Stage;
+		public function get stage ():Stage { return this._stage; }
+		fexel function setStage (v:Stage):void { this._stage = v; }
+		
 		private var _matrix:Matrix;
 		private var _oldTransformation:Object;
 		
@@ -48,6 +53,8 @@ package com.mgrenier.fexel.display
 			this.refX = this.refY = 0;
 			this.blend = BlendMode.NORMAL;
 			this.colorTransform = new ColorTransform();
+			
+			this._matrix = new Matrix();
 		}
 		
 		/**
@@ -74,11 +81,12 @@ package com.mgrenier.fexel.display
 		 * Render to buffer
 		 * 
 		 * @param	buffer
+		 * @param	bounds
 		 * @param	transformation
 		 * @param	color
 		 * @param	rate
 		 */
-		fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform):void
+		fexel function render (buffer:BitmapData, bounds:Rectangle2D, matrix:Matrix, color:ColorTransform):void
 		{
 		}
 		
@@ -90,7 +98,6 @@ package com.mgrenier.fexel.display
 		public function getMatrix ():Matrix
 		{
 			if (
-				!this._matrix ||
 				!this._oldTransformation ||
 				this._oldTransformation.x != this.x ||
 				this._oldTransformation.y != this.y ||
@@ -154,26 +161,11 @@ package com.mgrenier.fexel.display
 				matrix = new Matrix(1, 0, 0, 1, -this.refX, -this.refY);
 				matrix.concat(this.getMatrix());
 			}
-			var	upperleft:Point = matrix.transformPoint(new Point(this.x, this.y)),
-				upperright:Point = matrix.transformPoint(new Point(this.x + this.width, this.y)),
-				bottomleft:Point = matrix.transformPoint(new Point(this.x, this.y + this.height)),
-				bottomright:Point = matrix.transformPoint(new Point(this.x + this.width, this.y + this.height)),
-				left:Number = Number.MAX_VALUE,
-				right:Number = Number.MIN_VALUE,
-				top:Number = Number.MAX_VALUE,
-				bottom:Number = Number.MIN_VALUE,
 			
-			left = FastMath.min(upperleft.x, FastMath.min(upperright.x, FastMath.min(bottomleft.x, bottomright.x)));
-			right = FastMath.max(upperleft.x, FastMath.max(upperright.x, FastMath.max(bottomleft.x, bottomright.x)));
-			top = FastMath.min(upperleft.y, FastMath.min(upperright.y, FastMath.min(bottomleft.y, bottomright.y)));
-			bottom = FastMath.max(upperleft.y, FastMath.max(upperright.y, FastMath.max(bottomleft.y, bottomright.y)));
-			
-			return new Rectangle2D(
-				left + this.refX,
-				top + this.refY,
-				right - left,
-				bottom - top
-			);
+			var bounds:Rectangle2D = this.bounds(matrix);
+			bounds.x += this.refX;
+			bounds.y += this.refY;
+			return bounds;
 		}
 	}
 }

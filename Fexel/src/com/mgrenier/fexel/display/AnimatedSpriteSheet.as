@@ -143,7 +143,7 @@ package com.mgrenier.fexel.display
 				{
 					if (currentFrame > anim.cells.length - 1)
 					{
-						if (anim.callback)
+						if (anim.callback != null)
 							anim.callback();
 						if (anim.loop)
 							this._currentFrame = currentFrame = 0;

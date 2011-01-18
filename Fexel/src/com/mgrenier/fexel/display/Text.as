@@ -103,6 +103,8 @@ package com.mgrenier.fexel.display
 			//this.width = this.bitmapData.width;
 			//this.height = this.bitmapData.height;
 			
+			this.bitmapData.lock();
+			
 			this._matrix.tx = this._matrix.ty = 0;
 			if (this.shadowX != 0 || this.shadowY != 0)
 			{
@@ -116,6 +118,8 @@ package com.mgrenier.fexel.display
 			}
 			
 			this.bitmapData.draw(this.textField, this._matrix);
+			
+			this.bitmapData.unlock();
 			
 			super.update(rate);
 		}

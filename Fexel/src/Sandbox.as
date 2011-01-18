@@ -131,12 +131,12 @@ package
 				b.update(30);
 				t.update(30);
 			}
-			for (var i = 1; i > 0; --i) {
+			for (var i:int = 1; i > 0; --i) {
 				
 				//t.colorTransform.color = Math.random() * -0xffffff;
 				//t.colorTransform.redMultiplier = t.colorTransform.greenMultiplier = t.colorTransform.blueMultiplier = t.colorTransform.alphaMultiplier = Math.max(0.8, Math.random());
 				//t.blend = this.blend[Math.floor(Math.random() * this.blend.length)];
-				t.render(buffer, matrix, color);
+				//t.render(buffer, matrix, color);
 				t.rotation += 2;
 				
 				//b.color.color = Math.random() * -0xffffff;

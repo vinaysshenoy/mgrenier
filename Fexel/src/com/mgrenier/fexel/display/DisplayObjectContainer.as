@@ -9,6 +9,7 @@ package com.mgrenier.fexel.display
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.ColorTransform;
+	import com.mgrenier.geom.Rectangle2D;
 	
 	/**
 	 * Display Object Container
@@ -59,7 +60,8 @@ package com.mgrenier.fexel.display
 		override public function update (rate:int = 0):void
 		{
 			var i:int,
-				n:int;
+				n:int,
+				c:DisplayObject;
 			
 			for (i = 0, n = this.childs.length; i < n; ++i)
 			{
@@ -72,11 +74,12 @@ package com.mgrenier.fexel.display
 		 * Render to buffer
 		 * 
 		 * @param	buffer
+		 * @param	bounds
 		 * @param	transformation
 		 * @param	color
 		 * @param	rate
 		 */
-		override fexel function render (buffer:BitmapData, matrix:Matrix, color:ColorTransform):void
+		override fexel function render (buffer:BitmapData, bounds:Rectangle2D, matrix:Matrix, color:ColorTransform):void
 		{
 			var i:int,
 				n:int,
@@ -129,6 +132,7 @@ package com.mgrenier.fexel.display
 		 */
 		public function addChild (c:DisplayObject):DisplayObject
 		{
+			c.setStage(this.stage);
 			c.setParent(this);
 			this.childs.push(c);
 			return c;
@@ -156,6 +160,7 @@ package com.mgrenier.fexel.display
 			var splice:Vector.<DisplayObject> = this.childs.splice(i, 1);
 			if (splice.length == 0)
 				return null;
+			splice[0].setStage(null);
 			splice[0].setParent(null);
 			return splice[0];
 		}
@@ -166,7 +171,11 @@ package com.mgrenier.fexel.display
 		public function removeAllChilds ():DisplayObjectContainer
 		{
 			for (var n:int = this.childs.length - 1; n >= 0; n--)
+			{
+				this.childs[n].setStage(null);
 				this.childs[n].setParent(null);
+				this.childs[n] = null;
+			}
 			this.childs = new Vector.<DisplayObject>();
 			return this;
 		}
