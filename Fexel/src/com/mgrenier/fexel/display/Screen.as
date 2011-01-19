@@ -104,6 +104,7 @@ package com.mgrenier.fexel.display
 			this._offsetMatrix.identity();
 			this._offsetMatrix.rotate((this.camRotation % 360) * 0.0174532925);
 			this._offsetMatrix.scale(this.zoom, this.zoom);
+			this._offsetMatrix.translate(this.camX - hwidth, this.camY - hheight);
 			this._matrix.identity();
 			this._matrix.translate(-hwidth, -hheight);
 			this._matrix.concat(this._offsetMatrix);

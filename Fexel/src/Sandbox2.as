@@ -74,6 +74,8 @@ package
 		protected var _stage:Stage;
 		protected var _screen:Screen;
 		protected var _tv:com.mgrenier.fexel.display.Bitmap;
+		protected var _text:Text;
+		protected var _yoshi:AnimatedSpriteSheet;
 		
 		protected function initialize ():void
 		{
@@ -83,31 +85,31 @@ package
 			
 			_stage = new Stage();
 			_screen = new Screen(stage.stageWidth, stage.stageHeight);
-			_screen.zoom = 1.9;
+			_screen.zoom = 1.5;
 			
-			var text1:Text = new Text(200, "Hello World A", 30);
-			text1.x = 250;
-			text1.y = 200;
-			text1.update();
+			_text = new Text(200, "Hello World A", 30);
+			_text.x = 250;
+			_text.y = 200;
+			_text.update();
 			
 			_tv = new com.mgrenier.fexel.display.Bitmap(200, 200);
 			_tv.scaleX = _tv.scaleY = 0.5;
 			_tv.x = 100;
 			_tv.y = 100;
 			
-			var yoshi:AnimatedSpriteSheet = new AnimatedSpriteSheet(48, 48, 12);
-			yoshi.spriteData = TextureLoader.load("yoshi", this.yoshi);
-			yoshi.addAnimation("runRight", new <int>[21, 22, 23, 24], true);
-			yoshi.play("runRight");
-			yoshi.x = 50;
-			yoshi.y = 200;
-			yoshi.update(30);
+			_yoshi = new AnimatedSpriteSheet(48, 48, 12);
+			_yoshi.spriteData = TextureLoader.load("yoshi", this.yoshi);
+			_yoshi.addAnimation("runRight", new <int>[21, 22, 23, 24], true);
+			_yoshi.play("runRight");
+			_yoshi.x = 50;
+			_yoshi.y = 200;
+			_yoshi.update(30);
 			
 			_stage.addScreen(_screen);
 			addChild(_screen);
 			
-			_stage.addChild(yoshi);
-			_stage.addChild(text1);
+			_stage.addChild(_yoshi);
+			_stage.addChild(_text);
 			_stage.addChild(_tv);
 			
 			
@@ -122,14 +124,40 @@ package
 				Console.log(_screen.zoom);
 			}
 			
-			if (Input.keyState(Input.NUMPAD_ADD))
-				_screen.zoom += 0.05;
-			if (Input.keyState(Input.NUMPAD_SUBTRACT))
-				_screen.zoom -= 0.05;
-			if (Input.keyState(Input.NUMPAD_0))
-				_screen.zoom = 1;
+			var step:int = 2;
 			
-			_screen.camRotation += 0.5;
+			if (Input.keyState(Input.UP))
+				_screen.camY -= step;
+			if (Input.keyState(Input.DOWN))
+				_screen.camY += step;
+			if (Input.keyState(Input.RIGHT))
+				_screen.camX -= step;
+			if (Input.keyState(Input.LEFT))
+				_screen.camX += step;
+			
+			if (Input.keyState(Input.W))
+				_screen.zoom += 0.05;
+			if (Input.keyState(Input.S))
+				_screen.zoom -= 0.05;
+			if (Input.keyState(Input.A))
+				_screen.camRotation -= step;
+			if (Input.keyState(Input.D))
+				_screen.camRotation += step;
+			
+			if (Input.keyState(Input.NUMPAD_0))
+			{
+				_screen.zoom = 1;
+				_screen.camX = stage.stageWidth / 2;
+				_screen.camY = stage.stageHeight / 2;
+				_screen.camRotation = 0;
+			}
+			
+			
+			//_screen.camRotation += 0.5;
+			
+			_yoshi.colorTransform.color = _text.colorTransform.color = Math.random() * 0xffffff;
+			//_yoshi.blend = _text.blend = BlendMode.DIFFERENCE;
+			//_yoshi.colorTransform.redMultiplier = _yoshi.colorTransform.greenMultiplier = _yoshi.colorTransform.blueMultiplier = _yoshi.colorTransform.alphaMultiplier = _text.colorTransform.redMultiplier = _text.colorTransform.greenMultiplier = _text.colorTransform.blueMultiplier = _text.colorTransform.alphaMultiplier = Math.max(0.8, Math.random());
 			
 			if (_tv.bitmapData)
 				_tv.bitmapData.dispose();
