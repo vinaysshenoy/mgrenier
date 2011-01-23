@@ -112,12 +112,14 @@ package com.mgrenier.fexel.display
 		 * Render to buffer
 		 * 
 		 * @param	buffer
+		 * @param	rect
 		 * @param	bounds
 		 * @param	transformation
 		 * @param	color
-		 * @param	rate
+		 * @param	debug
+		 * @param	debugColor
 		 */
-		override fexel function render (buffer:BitmapData, bounds:Rectangle2D, matrix:Matrix, color:ColorTransform):void
+		override fexel function render (buffer:BitmapData, rect:Rectangle2D, bounds:Rectangle2D, matrix:Matrix, color:ColorTransform, debug:uint, debugColor:DebugColor):void
 		{
 			if (!this.bitmapData)
 				return;
@@ -167,7 +169,7 @@ package com.mgrenier.fexel.display
 				buffer.copyPixels(drawData, this._sourceRect, this._destPoint, null, null, this.transparent);
 			}
 			
-			super.render(buffer, bounds, matrix, color);
+			super.render(buffer, rect, bounds, matrix, color, debug, debugColor);
 		}
 	}
 }

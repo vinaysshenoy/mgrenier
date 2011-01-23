@@ -203,7 +203,7 @@ package com.mgrenier.geom
 		 * @param	m
 		 * @return
 		 */
-		public function bounds (m:Matrix):Rectangle2D
+		public function bounds (m:Matrix, r:Rectangle2D = null):Rectangle2D
 		{
 			var	upperleft:Point = m.transformPoint(new Point(this.x, this.y)),
 				upperright:Point = m.transformPoint(new Point(this.x + this.width, this.y)),
@@ -219,12 +219,14 @@ package com.mgrenier.geom
 			top = FastMath.min(upperleft.y, FastMath.min(upperright.y, FastMath.min(bottomleft.y, bottomright.y)));
 			bottom = FastMath.max(upperleft.y, FastMath.max(upperright.y, FastMath.max(bottomleft.y, bottomright.y)));
 			
-			return new Rectangle2D(
-				left,
-				top,
-				right - left,
-				bottom - top
-			);
+			if (!r)
+				r = new Rectangle2D();
+			r.x = left;
+			r.y = top;
+			r.width = right - left;
+			r.height = bottom - top;
+			
+			return r;
 		}
 		
 	}

@@ -5,7 +5,6 @@ package com.mgrenier.fexel
 	
 	import com.mgrenier.fexel.display.DisplayObject;
 	import com.mgrenier.fexel.display.Screen;
-	import com.mgrenier.fexel.display.View;
 	import com.mgrenier.utils.Disposable;
 	
 	import flash.display.BitmapData;

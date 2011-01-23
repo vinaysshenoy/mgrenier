@@ -13,6 +13,7 @@ package com.mgrenier.fexel.display
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
+	import flash.display.Sprite;
 	
 	/**
 	 * Screen
@@ -21,6 +22,8 @@ package com.mgrenier.fexel.display
 	 */
 	public class Screen extends Bitmap implements Disposable
 	{
+		static public const DEBUG_BOUNDINGBOX:uint = 1;
+		
 		public var fill:uint;
 		public var zoom:Number;
 		public var camX:int;
@@ -28,7 +31,11 @@ package com.mgrenier.fexel.display
 		public var camRotation:Number;
 		public var colorTransform:ColorTransform;
 		
+		public var debug:uint;
+		public var debugColor:DebugColor;
+		
 		protected var _rect:Rectangle;
+		protected var _rect2D:Rectangle2D;
 		protected var _matrix:Matrix;
 		protected var _offsetMatrix:Matrix;
 		protected var _bounds:Rectangle2D;
@@ -47,7 +54,11 @@ package com.mgrenier.fexel.display
 			this.zoom = zoom;
 			this.colorTransform = new ColorTransform();
 			
+			this.debug = 0;
+			this.debugColor = new DebugColor();
+			
 			this._rect = new Rectangle();
+			this._rect2D = new Rectangle2D();
 			this._matrix = new Matrix();
 			this._offsetMatrix = new Matrix();
 			this._bounds = new Rectangle2D();
@@ -85,6 +96,7 @@ package com.mgrenier.fexel.display
 			this._offsetMatrix = null;
 			this._bounds = null;
 			this._color = null;
+			this.debugColor = null;
 		}
 		
 		/**
@@ -102,15 +114,16 @@ package com.mgrenier.fexel.display
 			this.zoom = this.zoom < 0 ? 0 : this.zoom;
 			
 			this._offsetMatrix.identity();
+			this._offsetMatrix.translate(this.camX - hwidth, this.camY - hheight);
 			this._offsetMatrix.rotate((this.camRotation % 360) * 0.0174532925);
 			this._offsetMatrix.scale(this.zoom, this.zoom);
-			this._offsetMatrix.translate(this.camX - hwidth, this.camY - hheight);
 			this._matrix.identity();
 			this._matrix.translate(-hwidth, -hheight);
 			this._matrix.concat(this._offsetMatrix);
 			this._matrix.translate(hwidth, hheight);
 			
-			this._bounds = fov.bounds(this._matrix);
+			//this._bounds = fov.bounds(this._matrix);
+			fov.bounds(this._matrix, this._bounds);
 			
 			this._color.alphaMultiplier = this.colorTransform.alphaMultiplier;
 			this._color.alphaOffset = this.colorTransform.alphaOffset;
@@ -121,18 +134,21 @@ package com.mgrenier.fexel.display
 			this._color.redMultiplier = this.colorTransform.redMultiplier;
 			this._color.redOffset = this.colorTransform.redOffset;
 			
-			this._rect.width = this.bitmapData.width;
-			this._rect.height = this.bitmapData.height;
+			this._rect.width = this._rect2D.width = this.bitmapData.width;
+			this._rect.height = this._rect2D.height = this.bitmapData.height;
 			
 			this.bitmapData.lock();
-			
 			this.bitmapData.fillRect(this._rect, this.fill);
 			
+			var c:DisplayObject;
 			for (i = 0, n = children.length; i < n; ++i)
 			{
-				children[i].render(this.bitmapData, this._bounds, this._matrix, this._color);
+				c = children[i];
+				c.bounds(this._matrix, c._bounds);
+				if (!c is DisplayObjectContainer && !this._rect2D.intersects(c._bounds))
+					continue;
+				c.render(this.bitmapData, this._rect2D, this._bounds, this._matrix, this._color, this.debug, this.debugColor);
 			}
-			
 			this.bitmapData.unlock();
 		}
 		
@@ -166,16 +182,19 @@ package com.mgrenier.fexel.display
 		 * 
 		 * @return
 		 */
-		public function getFieldOfView ():Rectangle2D
+		public function getFieldOfView (fov:Rectangle2D = null):Rectangle2D
 		{
 			var zwidth:Number = this.width / this.zoom,
 				zheight:Number = this.height / this.zoom;
-			return new Rectangle2D(
-				this.camX - (zwidth / 2),
-				this.camY - (zheight / 2),
-				zwidth,
-				zheight
-			);
+			if (!fov)
+				fov = new Rectangle2D();
+			fov.x = this.camX - (zwidth / 2);
+			fov.x = -fov.x;
+			fov.y = this.camY - (zheight / 2);
+			fov.y = -fov.y;
+			fov.width = zwidth;
+			fov.height = zheight;
+			return fov;
 		}
 		
 	}

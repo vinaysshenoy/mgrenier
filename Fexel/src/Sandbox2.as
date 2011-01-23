@@ -75,7 +75,9 @@ package
 		protected var _screen:Screen;
 		protected var _tv:com.mgrenier.fexel.display.Bitmap;
 		protected var _text:Text;
+		protected var _shape:Shape;
 		protected var _yoshi:AnimatedSpriteSheet;
+		protected var _container:DisplayObjectContainer;
 		
 		protected function initialize ():void
 		{
@@ -85,7 +87,8 @@ package
 			
 			_stage = new Stage();
 			_screen = new Screen(stage.stageWidth, stage.stageHeight);
-			_screen.zoom = 1.5;
+			_screen.debug = Screen.DEBUG_BOUNDINGBOX;
+			//_screen.zoom = 1.5;
 			
 			_text = new Text(200, "Hello World A", 30);
 			_text.x = 250;
@@ -105,12 +108,27 @@ package
 			_yoshi.y = 200;
 			_yoshi.update(30);
 			
+			_shape = new Shape(50, 50);
+			_shape.x = stage.stageWidth / 2 - 25;
+			_shape.y = stage.stageHeight / 2 - 25;
+			_shape.graphics.beginFill(0xffffff);
+			_shape.graphics.drawRect(0, 0, 50, 50);
+			_shape.graphics.endFill();
+			_shape.update();
+			
+			_container = new DisplayObjectContainer();
+			_container.x = 100;
+			_container.y = 100;
+			
 			_stage.addScreen(_screen);
 			addChild(_screen);
 			
-			_stage.addChild(_yoshi);
-			_stage.addChild(_text);
-			_stage.addChild(_tv);
+			_stage.addChild(_container);
+			//_stage.addChild(_yoshi);
+			_container.addChild(_yoshi);
+			_stage.addChild(_shape);
+			//_stage.addChild(_text);
+			//_stage.addChild(_tv);
 			
 			
 			this.addEventListener(Event.ENTER_FRAME, this.enterFrame);

@@ -74,26 +74,29 @@ package com.mgrenier.fexel.display
 		 * Render to buffer
 		 * 
 		 * @param	buffer
+		 * @param	rect
 		 * @param	bounds
 		 * @param	transformation
 		 * @param	color
-		 * @param	rate
+		 * @param	debug
+		 * @param	debugColor
 		 */
-		override fexel function render (buffer:BitmapData, bounds:Rectangle2D, matrix:Matrix, color:ColorTransform):void
+		override fexel function render (buffer:BitmapData, rect:Rectangle2D, bounds:Rectangle2D, matrix:Matrix, color:ColorTransform, debug:uint, debugColor:DebugColor):void
 		{
 			var i:int,
 				n:int,
-				c:DisplayObject;
+				c:DisplayObject,
+				m:Matrix = this.getMatrix();
 			
-			this._matrix.a = matrix.a;
-			this._matrix.b = matrix.b;
-			this._matrix.c = matrix.c;
-			this._matrix.d = matrix.d;
-			this._matrix.tx = matrix.tx;
-			this._matrix.ty = matrix.ty;
+			this._matrix.a = m.a;
+			this._matrix.b = m.b;
+			this._matrix.c = m.c;
+			this._matrix.d = m.d;
+			this._matrix.tx = m.tx;
+			this._matrix.ty = m.ty;
 			
 			this._matrix.translate(-this.refX, -this.refY);
-			this._matrix.concat(this.getMatrix());
+			this._matrix.concat(matrix);
 			this._matrix.translate(this.refX, this.refY);
 			
 			this._color.alphaMultiplier = color.alphaMultiplier;
@@ -110,7 +113,10 @@ package com.mgrenier.fexel.display
 			for (i = 0, n = this.childs.length; i < n; ++i)
 			{
 				c = this.childs[i];
-				c.render(buffer, this._matrix, this._color);
+				c.bounds(this._matrix, c._bounds);
+				if (!rect.intersects(c._bounds))
+					continue;
+				c.render(buffer, rect, bounds, this._matrix, this._color, debug, debugColor);
 			}
 		}
 		

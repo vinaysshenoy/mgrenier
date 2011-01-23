@@ -14,6 +14,7 @@ package com.mgrenier.fexel.display
 	import flash.display.BlendMode;
 	import flash.geom.ColorTransform;
 	import com.mgrenier.fexel.Stage;
+	import flash.display.Sprite;
 	
 	/**
 	 * Display Object
@@ -22,6 +23,7 @@ package com.mgrenier.fexel.display
 	 */
 	public class DisplayObject extends Rectangle2D implements Disposable
 	{
+		public var visible:Boolean;
 		public var rotation:Number;
 		public var scaleX:Number;
 		public var scaleY:Number;
@@ -42,12 +44,16 @@ package com.mgrenier.fexel.display
 		private var _matrix:Matrix;
 		private var _oldTransformation:Object;
 		
+		fexel var _bounds:Rectangle2D;
+		public function get boundingBox ():Rectangle2D { return this._bounds;	}
+		
 		/**
 		 * Constructor
 		 */
 		public function DisplayObject(x:Number=0, y:Number=0, width:Number=0, height:Number=0)
 		{
 			super(x, y, width, height);
+			this.visible = true;
 			this.rotation = 0;
 			this.scaleX = this.scaleY = 1;
 			this.refX = this.refY = 0;
@@ -55,6 +61,7 @@ package com.mgrenier.fexel.display
 			this.colorTransform = new ColorTransform();
 			
 			this._matrix = new Matrix();
+			this._bounds = new Rectangle2D();
 		}
 		
 		/**
@@ -66,6 +73,7 @@ package com.mgrenier.fexel.display
 			this.colorTransform = null;
 			this._oldTransformation = null;
 			this._matrix = null;
+			this._bounds = null;
 		}
 		
 		/**
@@ -81,13 +89,28 @@ package com.mgrenier.fexel.display
 		 * Render to buffer
 		 * 
 		 * @param	buffer
+		 * @param	rect
 		 * @param	bounds
 		 * @param	transformation
 		 * @param	color
-		 * @param	rate
+		 * @param	debug
+		 * @param	debugColor
 		 */
-		fexel function render (buffer:BitmapData, bounds:Rectangle2D, matrix:Matrix, color:ColorTransform):void
+		fexel function render (buffer:BitmapData, rect:Rectangle2D, bounds:Rectangle2D, matrix:Matrix, color:ColorTransform, debug:uint, debugColor:DebugColor):void
 		{
+			var debugDraw:Sprite = Bitmap.sprite;
+			if (debug > 0)
+			{
+				debugDraw.graphics.clear();
+				if (debug & Screen.DEBUG_BOUNDINGBOX)
+				{
+					debugDraw.graphics.beginFill(0x000000, 0);
+					debugDraw.graphics.lineStyle(1, debugColor.boundingColor);
+					debugDraw.graphics.drawRect(this.boundingBox.x, this.boundingBox.y, this.boundingBox.width, this.boundingBox.height);
+					debugDraw.graphics.endFill();
+				}
+				buffer.draw(debugDraw);
+			}
 		}
 		
 		/**
@@ -116,12 +139,12 @@ package com.mgrenier.fexel.display
 				
 				this._oldTransformation = {
 					'x': this.x,
-						'y': this.y,
-						'rotation': this.rotation,
-						'scaleX': this.scaleX,
-						'scaleY': this.scaleY,
-						'refX': this.refX,
-						'refY': this.refY
+					'y': this.y,
+					'rotation': this.rotation,
+					'scaleX': this.scaleX,
+					'scaleY': this.scaleY,
+					'refX': this.refX,
+					'refY': this.refY
 				}
 			}
 			
