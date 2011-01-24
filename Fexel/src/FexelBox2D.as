@@ -155,7 +155,7 @@ package
 			this.removeEventListener(Event.ENTER_FRAME, this.enterFrame);
 			var body:b2Body;
 			
-			for (_world.GetBodyList(); body; body = body.GetNext())
+			for (body = _world.GetBodyList(); body; body = body.GetNext())
 				_world.DestroyBody(body);
 			
 			_world.SetDebugDraw(null);
