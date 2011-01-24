@@ -126,12 +126,12 @@ package com.mgrenier.fexel.display
 			
 			var m:Matrix = this.getMatrix();
 			
-			this._matrix.a = m.a;
-			this._matrix.b = m.b;
-			this._matrix.c = m.c;
-			this._matrix.d = m.d;
-			this._matrix.tx = m.tx;
-			this._matrix.ty = m.ty;
+			this._matrix.a = matrix.a;
+			this._matrix.b = matrix.b;
+			this._matrix.c = matrix.c;
+			this._matrix.d = matrix.d;
+			this._matrix.tx = matrix.tx;
+			this._matrix.ty = matrix.ty;
 			this._color.alphaMultiplier = color.alphaMultiplier;
 			this._color.alphaOffset = color.alphaOffset;
 			this._color.blueMultiplier = color.blueMultiplier;
@@ -141,11 +141,12 @@ package com.mgrenier.fexel.display
 			this._color.redMultiplier = color.redMultiplier;
 			this._color.redOffset = color.redOffset;
 			
-			
 			this._matrix.translate(-this.refX, -this.refY);
 			//this._matrix.concat(this.getMatrix());
-			this._matrix.concat(matrix);
+			this._matrix.concat(m);
 			this._matrix.translate(this.refX, this.refY);
+			//this._matrix.translate(-100, -100);
+			//this._matrix.translate(this.refX, this.refY);
 			this._color.concat(this.colorTransform);
 			
 			this._sourceRect.width = this.bitmapData.width;

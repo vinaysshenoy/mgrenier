@@ -41,9 +41,8 @@ package com.mgrenier.fexel.display
 		override public function dispose ():void
 		{
 			var c:DisplayObject;
-			while (this.childs.length > 0)
+			while (c = this.childs.pop())
 			{
-				c = this.childs.pop();
 				c.dispose();
 				c = null;
 			}

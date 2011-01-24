@@ -53,6 +53,8 @@ package
 			addChild(Input.getInstance());
 			
 			stage.quality = StageQuality.LOW;
+			stage.scaleMode = StageScaleMode.NO_SCALE;
+			stage.align = StageAlign.TOP_LEFT;
 		}
 		
 		final private function uninit(e:Event = null):void 
@@ -72,7 +74,8 @@ package
 		protected var yoshi:Class;
 		
 		protected var _stage:Stage;
-		protected var _screen:Screen;
+		protected var _screen1:Screen;
+		protected var _screen2:Screen;
 		protected var _tv:com.mgrenier.fexel.display.Bitmap;
 		protected var _text:Text;
 		protected var _shape:Shape;
@@ -81,13 +84,11 @@ package
 		
 		protected function initialize ():void
 		{
-			stage.scaleMode = StageScaleMode.NO_SCALE;
-			stage.align = StageAlign.TOP_LEFT;
-			
-			
 			_stage = new Stage();
-			_screen = new Screen(stage.stageWidth, stage.stageHeight);
-			_screen.debug = Screen.DEBUG_BOUNDINGBOX;
+			_screen1 = new Screen(stage.stageWidth / 2, stage.stageHeight);
+			_screen1.debug = Screen.DEBUG_BOUNDINGBOX;
+			_screen2 = new Screen(stage.stageWidth / 2, stage.stageHeight);
+			_screen2.x = stage.stageWidth / 2;
 			//_screen.zoom = 1.5;
 			
 			_text = new Text(200, "Hello World A", 30);
@@ -109,7 +110,7 @@ package
 			_yoshi.update(30);
 			
 			_shape = new Shape(50, 50);
-			_shape.x = stage.stageWidth / 2 - 25;
+			_shape.x = stage.stageWidth / 2 / 2 - 25;
 			_shape.y = stage.stageHeight / 2 - 25;
 			_shape.graphics.beginFill(0xffffff);
 			_shape.graphics.drawRect(0, 0, 50, 50);
@@ -120,8 +121,10 @@ package
 			_container.x = 100;
 			_container.y = 100;
 			
-			_stage.addScreen(_screen);
-			addChild(_screen);
+			_stage.addScreen(_screen1);
+			_stage.addScreen(_screen2);
+			addChild(_screen1);
+			addChild(_screen2);
 			
 			_stage.addChild(_container);
 			//_stage.addChild(_yoshi);
@@ -139,35 +142,35 @@ package
 			if (Input.keyState(Input.SPACE))
 			{
 				Memory.forceGC();
-				Console.log(_screen.zoom);
+				Console.log(_screen1.zoom);
 			}
 			
 			var step:int = 2;
 			
 			if (Input.keyState(Input.UP))
-				_screen.camY -= step;
+				_screen1.camY -= step;
 			if (Input.keyState(Input.DOWN))
-				_screen.camY += step;
+				_screen1.camY += step;
 			if (Input.keyState(Input.RIGHT))
-				_screen.camX -= step;
+				_screen1.camX -= step;
 			if (Input.keyState(Input.LEFT))
-				_screen.camX += step;
+				_screen1.camX += step;
 			
 			if (Input.keyState(Input.W))
-				_screen.zoom += 0.05;
+				_screen1.zoom += 0.05;
 			if (Input.keyState(Input.S))
-				_screen.zoom -= 0.05;
+				_screen1.zoom -= 0.05;
 			if (Input.keyState(Input.A))
-				_screen.camRotation -= step;
+				_screen1.camRotation -= step;
 			if (Input.keyState(Input.D))
-				_screen.camRotation += step;
+				_screen1.camRotation += step;
 			
 			if (Input.keyState(Input.NUMPAD_0))
 			{
-				_screen.zoom = 1;
-				_screen.camX = stage.stageWidth / 2;
-				_screen.camY = stage.stageHeight / 2;
-				_screen.camRotation = 0;
+				_screen1.zoom = 1;
+				_screen1.camX = stage.stageWidth / 2 / 2;
+				_screen1.camY = stage.stageHeight / 2;
+				_screen1.camRotation = 0;
 			}
 			
 			
@@ -179,7 +182,7 @@ package
 			
 			if (_tv.bitmapData)
 				_tv.bitmapData.dispose();
-			_tv.bitmapData = _screen.bitmapData.clone();
+			_tv.bitmapData = _screen1.bitmapData.clone();
 			_stage.render();
 		}
 		

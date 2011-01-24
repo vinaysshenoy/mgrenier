@@ -46,13 +46,10 @@ package com.mgrenier.fexel
 			
 			while (c = this.childs.pop())
 			{
-				c = this.childs.pop();
 				c.dispose();
 				c = null;
 			}
 			this.childs = null;
-			
-			super.dispose();
 		}
 		
 		/**

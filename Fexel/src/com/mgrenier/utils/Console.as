@@ -163,6 +163,13 @@
 				Console.dispatchEvent(new ConsoleEvent(ConsoleEvent.COMMAND, HString.trim(this.input.text)));
 				this.input.text = "";
 			}
+			else if (e.keyCode == 222)
+			{
+				e.preventDefault();
+				if (this.visible)
+					this.input.text = this.input.text.substr(0, this.input.text.length - 1);
+				this.visible = !this.visible;
+			}
 			e.stopPropagation();
 		}
 		
