@@ -25,7 +25,8 @@ package com.mgrenier.fexel.display
 		static public const DEBUG_BOUNDINGBOX:uint = 1;
 		
 		public var fill:uint;
-		public var zoom:Number;
+		public var camStretchX:Number;
+		public var camStretchY:Number;
 		public var camX:int;
 		public var camY:int;
 		public var camRotation:Number;
@@ -44,14 +45,14 @@ package com.mgrenier.fexel.display
 		/**
 		 * Constructor
 		 */
-		public function Screen(width:int, height:int, zoom:Number = 1, fill:uint = 0xff000000)
+		public function Screen(width:int, height:int, stretch:Number = 1, fill:uint = 0xff000000)
 		{
 			super(new BitmapData(width, height, fill >>> 24 != 255, fill), "auto", false);
 			this.camX = width / 2;
 			this.camY = height / 2;
 			this.camRotation = 0;
 			this.fill = fill;
-			this.zoom = zoom;
+			this.camStretchX = this.camStretchY = stretch;
 			this.colorTransform = new ColorTransform();
 			
 			this.debug = 0;
@@ -111,16 +112,12 @@ package com.mgrenier.fexel.display
 				i:int,
 				n:int;
 			
-			this.zoom = this.zoom < 0 ? 0 : this.zoom;
-			
-			this._offsetMatrix.identity();
-			this._offsetMatrix.translate(this.camX - hwidth, this.camY - hheight);
-			this._offsetMatrix.rotate((this.camRotation % 360) * 0.0174532925);
-			this._offsetMatrix.scale(this.zoom, this.zoom);
 			this._matrix.identity();
-			this._matrix.translate(-hwidth, -hheight);
-			this._matrix.concat(this._offsetMatrix);
-			this._matrix.translate(hwidth, hheight);
+			this._matrix.translate(-this.camX, -this.camY);
+			this._matrix.scale(this.camStretchX, this.camStretchY);
+			this._matrix.rotate((this.camRotation % 360) * 0.0174532925);
+			this._matrix.translate(this.camX, this.camY);
+			this._matrix.translate(this.camX - hwidth, this.camY - hheight);
 			
 			//this._bounds = fov.bounds(this._matrix);
 			fov.bounds(this._matrix, this._bounds);
@@ -144,8 +141,8 @@ package com.mgrenier.fexel.display
 			for (i = 0, n = children.length; i < n; ++i)
 			{
 				c = children[i];
-				c.bounds(this._matrix, c._bounds);
-				if (!c is DisplayObjectContainer && !this._rect2D.intersects(c._bounds))
+				c.preRender(this._rect2D, this._bounds, this._matrix, this._color);
+				if (!c is DisplayObjectContainer && !this._rect2D.intersects(c.boundingBox))
 					continue;
 				c.render(this.bitmapData, this._rect2D, this._bounds, this._matrix, this._color, this.debug, this.debugColor);
 			}
@@ -184,8 +181,8 @@ package com.mgrenier.fexel.display
 		 */
 		public function getFieldOfView (fov:Rectangle2D = null):Rectangle2D
 		{
-			var zwidth:Number = this.width / this.zoom,
-				zheight:Number = this.height / this.zoom;
+			var zwidth:Number = this.width / this.camStretchX,
+				zheight:Number = this.height / this.camStretchY;
 			if (!fov)
 				fov = new Rectangle2D();
 			fov.x = this.camX - (zwidth / 2);

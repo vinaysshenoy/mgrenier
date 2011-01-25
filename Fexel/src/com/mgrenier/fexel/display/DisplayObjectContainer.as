@@ -112,7 +112,7 @@ package com.mgrenier.fexel.display
 			for (i = 0, n = this.childs.length; i < n; ++i)
 			{
 				c = this.childs[i];
-				c.bounds(this._matrix, c._bounds);
+				c.preRender(rect, bounds, this._matrix, this._color);
 				if (!rect.intersects(c._bounds))
 					continue;
 				c.render(buffer, rect, bounds, this._matrix, this._color, debug, debugColor);

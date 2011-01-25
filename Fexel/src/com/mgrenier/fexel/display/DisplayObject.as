@@ -32,6 +32,9 @@ package com.mgrenier.fexel.display
 		public var blend:String;
 		public var colorTransform:ColorTransform;
 		
+		fexel var _matrixConcat:Matrix;
+		fexel var _colorConcat:ColorTransform;
+		
 		
 		private var _parent:DisplayObject;
 		public function get parent ():DisplayObject { return this._parent; }
@@ -62,6 +65,9 @@ package com.mgrenier.fexel.display
 			
 			this._matrix = new Matrix();
 			this._bounds = new Rectangle2D();
+			
+			this._matrixConcat = new Matrix();
+			this._colorConcat = new ColorTransform();
 		}
 		
 		/**
@@ -74,6 +80,8 @@ package com.mgrenier.fexel.display
 			this._oldTransformation = null;
 			this._matrix = null;
 			this._bounds = null;
+			this._matrixConcat = null;
+			this._colorConcat = null;
 		}
 		
 		/**
@@ -83,6 +91,43 @@ package com.mgrenier.fexel.display
 		 */
 		public function update (rate:int = 0):void
 		{
+		}
+		
+		/**
+		 * Pre Render
+		 * 
+		 * @param	rect
+		 * @param	bounds
+		 * @param	transformation
+		 * @param	color
+		 */
+		fexel function preRender (rect:Rectangle2D, bounds:Rectangle2D, matrix:Matrix, color:ColorTransform):void
+		{
+			var m:Matrix = this.getMatrix();
+			this._matrixConcat.a = m.a;
+			this._matrixConcat.b = m.b;
+			this._matrixConcat.c = m.c;
+			this._matrixConcat.d = m.d;
+			this._matrixConcat.tx = m.tx;
+			this._matrixConcat.ty = m.ty;
+			this._matrixConcat.concat(matrix);
+			
+			this._colorConcat.alphaMultiplier = this.colorTransform.alphaMultiplier;
+			this._colorConcat.alphaOffset = this.colorTransform.alphaOffset;
+			this._colorConcat.blueMultiplier = this.colorTransform.blueMultiplier;
+			this._colorConcat.blueOffset = this.colorTransform.blueOffset;
+			this._colorConcat.greenMultiplier = this.colorTransform.greenMultiplier;
+			this._colorConcat.greenOffset = this.colorTransform.greenOffset;
+			this._colorConcat.redMultiplier = this.colorTransform.redMultiplier;
+			this._colorConcat.redOffset = this.colorTransform.redOffset;
+			this._colorConcat.concat(color);
+			
+			var tx:Number = this.x, ty:Number = this.y;
+			this.x = 0;
+			this.y = 0;
+			this.bounds(this._matrixConcat, this._bounds);
+			this.x = tx;
+			this.y = ty;
 		}
 		
 		/**
@@ -133,8 +178,10 @@ package com.mgrenier.fexel.display
 			{
 				this._matrix = this._matrix || new Matrix();
 				this._matrix.identity();
-				this._matrix.rotate((this.rotation % 360) * 0.0174532925);
 				this._matrix.scale(this.scaleX, this.scaleY);
+				this._matrix.translate(-this.refX, -this.refY);
+				this._matrix.rotate((this.rotation % 360) * 0.0174532925);
+				this._matrix.translate(this.refX, this.refY);
 				this._matrix.translate(this.x, this.y);
 				
 				this._oldTransformation = {
@@ -184,11 +231,7 @@ package com.mgrenier.fexel.display
 				matrix = new Matrix(1, 0, 0, 1, -this.refX, -this.refY);
 				matrix.concat(this.getMatrix());
 			}
-			
-			var bounds:Rectangle2D = this.bounds(matrix);
-			bounds.x += this.refX;
-			bounds.y += this.refY;
-			return bounds;
+			return this.bounds(matrix);
 		}
 	}
 }

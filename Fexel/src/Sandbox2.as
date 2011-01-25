@@ -142,7 +142,6 @@ package
 			if (Input.keyState(Input.SPACE))
 			{
 				Memory.forceGC();
-				Console.log(_screen1.zoom);
 			}
 			
 			var step:int = 2;
@@ -156,10 +155,14 @@ package
 			if (Input.keyState(Input.LEFT))
 				_screen1.camX += step;
 			
-			if (Input.keyState(Input.W))
-				_screen1.zoom += 0.05;
-			if (Input.keyState(Input.S))
-				_screen1.zoom -= 0.05;
+			if (Input.keyState(Input.W)) {
+				_screen1.camStretchX += 0.05;
+				_screen1.camStretchY += 0.05;
+			}
+			if (Input.keyState(Input.S)) {
+				_screen1.camStretchX -= 0.05;
+				_screen1.camStretchY -= 0.05;
+			}
 			if (Input.keyState(Input.A))
 				_screen1.camRotation -= step;
 			if (Input.keyState(Input.D))
@@ -167,7 +170,7 @@ package
 			
 			if (Input.keyState(Input.NUMPAD_0))
 			{
-				_screen1.zoom = 1;
+				_screen1.camStretchX = _screen1.camStretchY = 1;
 				_screen1.camX = stage.stageWidth / 2 / 2;
 				_screen1.camY = stage.stageHeight / 2;
 				_screen1.camRotation = 0;

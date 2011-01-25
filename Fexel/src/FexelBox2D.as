@@ -13,6 +13,7 @@ package
 	import com.mgrenier.fexel.display.DisplayObject;
 	import com.mgrenier.fexel.display.Screen;
 	import com.mgrenier.fexel.display.Shape;
+	import com.mgrenier.geom.Vec2D;
 	import com.mgrenier.utils.Console;
 	import com.mgrenier.utils.Input;
 	import com.mgrenier.utils.Memory;
@@ -52,6 +53,7 @@ package
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			
+			_debug.y = stage.stageHeight / 2;
 			addChild(_debug);
 		}
 		
@@ -78,11 +80,15 @@ package
 		protected function initialize ():void
 		{
 			_stage = new Stage();
-			_screen1 = new Screen(stage.stageWidth, stage.stageHeight / 2, 1, 0x00000000);
+			_screen1 = new Screen(stage.stageWidth, stage.stageHeight / 2, 0.5, 0x00000000);
 			_stage.addScreen(_screen1);
 			addChildAt(_screen1, 0);
 			_screen2 = new Screen(stage.stageWidth, stage.stageHeight / 2, 1, 0x00000000);
+			//_screen2.debug = Screen.DEBUG_BOUNDINGBOX;
 			_screen2.y = stage.stageHeight / 2;
+			//_screen2.camStretchX = -1;
+			//_screen2.camRotation = 180;
+			//_screen2.colorTransform.alphaMultiplier = 0.5;
 			_stage.addScreen(_screen2);
 			addChildAt(_screen2, 0);
 			
@@ -95,9 +101,9 @@ package
 			debugDraw.SetLineThickness(1);
 			debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
 			
-			_world = new b2World(new b2Vec2(0, 10), true);
-			//_world.SetDebugDraw(debugDraw);
-			//_world.DrawDebugData();
+			_world = new b2World(new b2Vec2(0, 10), false);
+			_world.SetDebugDraw(debugDraw);
+			_world.DrawDebugData();
 			
 			var bodyDef:b2BodyDef = new b2BodyDef();
 			bodyDef.position.Set(stage.stageWidth / 30 / 2, stage.stageHeight / 2 / 30);
@@ -111,24 +117,43 @@ package
 			var body:b2Body = _world.CreateBody(bodyDef);
 			body.CreateFixture(fixtureDef);
 			
+			bodyDef = new b2BodyDef();
+			bodyDef.position.Set(stage.stageWidth / 30 / 2, 0);
+			bodyDef.type = b2Body.b2_staticBody;
+			body = _world.CreateBody(bodyDef);
+			body.CreateFixture(fixtureDef);
+			
+			boxShape = new b2PolygonShape();
+			boxShape.SetAsBox(10 / 30, stage.stageHeight / 30 / 2);
+			fixtureDef.shape = boxShape;
+			bodyDef = new b2BodyDef();
+			bodyDef.position.Set(0, stage.stageHeight / 2 / 30);
+			bodyDef.type = b2Body.b2_staticBody;
+			body = _world.CreateBody(bodyDef);
+			body.CreateFixture(fixtureDef);
+			
+			bodyDef = new b2BodyDef();
+			bodyDef.position.Set(stage.stageWidth / 30, stage.stageHeight / 2 / 30);
+			bodyDef.type = b2Body.b2_staticBody;
+			body = _world.CreateBody(bodyDef);
+			body.CreateFixture(fixtureDef);
+			
 			var circleShape:b2CircleShape,
 				_box:Shape;
 			for (var i:uint = 50; i > 0; --i)
 			{
 				bodyDef = new b2BodyDef();
 				bodyDef.position.Set(Math.random() * stage.stageWidth / 30, Math.random() * 100 / 30);
+				//bodyDef.angle = 0.5;
 				//bodyDef.type = Math.random() > 0.5 ? b2Body.b2_dynamicBody : b2Body.b2_staticBody;
 				bodyDef.type = b2Body.b2_dynamicBody;
 				//bodyDef.fixedRotation = true;
-				
+
 				_box = new Shape(20, 20);
 				_box.refX = 10;
 				_box.refY = 10;
-				_box.graphics.beginFill(0x0000ff);
+				_box.graphics.beginFill(0xffffff * Math.random() + 0x222222);
 				_box.graphics.drawRect(0, 0, 20, 20);
-				_box.graphics.endFill();
-				_box.graphics.beginFill(0xff00ff);
-				_box.graphics.drawCircle(1, 1, 1);
 				_box.graphics.endFill();
 				_box.update();
 				bodyDef.userData = _box;
@@ -171,7 +196,6 @@ package
 			if (Input.keyState(Input.SPACE))
 			{
 				Memory.forceGC();
-				Console.log(_screen1.zoom);
 			}
 			
 			var step:int = 2;
@@ -185,10 +209,14 @@ package
 			if (Input.keyState(Input.LEFT))
 				_screen1.camX += step;
 			
-			if (Input.keyState(Input.W))
-				_screen1.zoom += 0.05;
-			if (Input.keyState(Input.S))
-				_screen1.zoom -= 0.05;
+			if (Input.keyState(Input.W)) {
+				_screen1.camStretchX += 0.05;
+				_screen1.camStretchY += 0.05;
+			}
+			if (Input.keyState(Input.S)) {
+				_screen1.camStretchX -= 0.05;
+				_screen1.camStretchY -= 0.05;
+			}
 			if (Input.keyState(Input.A))
 				_screen1.camRotation -= step;
 			if (Input.keyState(Input.D))
@@ -196,11 +224,18 @@ package
 			
 			if (Input.keyState(Input.NUMPAD_0))
 			{
-				_screen1.zoom = 1;
-				_screen1.camX = stage.stageWidth / 2 / 2;
-				_screen1.camY = stage.stageHeight / 2;
+				//_screen1.camStretchX = _screen1.camStretchY = 1;
+				_screen1.camX = stage.stageWidth / 2;
+				_screen1.camY = stage.stageHeight / 2 / 2;
 				_screen1.camRotation = 0;
 			}
+			
+			var gravity:b2Vec2 = _world.GetGravity(),
+				vec:Vec2D = new Vec2D(0, 10);
+			vec.rotateDegree(-_screen1.camRotation);
+			gravity.x = vec.x;
+			gravity.y = vec.y;
+			_world.SetGravity(gravity);
 			
 			var time:int = getTimer();
 			

@@ -28,11 +28,10 @@ package com.mgrenier.fexel.display
 		private var _sourceRect:Rectangle;
 		private var _destPoint:Point;
 		
-		private var _matrix:Matrix;
-		private var _color:ColorTransform;
-		
 		private var _maskData:BitmapData;
 		private var _maskPoint:Point;
+		
+		private var _refMatrix:Matrix;
 		
 		public function get maskData():BitmapData { return this._maskData; }
 		public function set maskData(v:BitmapData):void {
@@ -68,8 +67,7 @@ package com.mgrenier.fexel.display
 			this._destPoint = new Point(0, 0);
 			this._maskData = null;
 			this._maskPoint = null;
-			this._matrix = new Matrix();
-			this._color = new ColorTransform();
+			this._refMatrix = new Matrix();
 		}
 		
 		/**
@@ -92,8 +90,7 @@ package com.mgrenier.fexel.display
 				this._combinedData.dispose();
 			this._combinedData = null;
 			
-			this._matrix = null;
-			this._color = null;
+			this._refMatrix = null;
 			
 			super.dispose();
 		}
@@ -124,46 +121,21 @@ package com.mgrenier.fexel.display
 			if (!this.bitmapData)
 				return;
 			
-			var m:Matrix = this.getMatrix();
-			
-			this._matrix.a = matrix.a;
-			this._matrix.b = matrix.b;
-			this._matrix.c = matrix.c;
-			this._matrix.d = matrix.d;
-			this._matrix.tx = matrix.tx;
-			this._matrix.ty = matrix.ty;
-			this._color.alphaMultiplier = color.alphaMultiplier;
-			this._color.alphaOffset = color.alphaOffset;
-			this._color.blueMultiplier = color.blueMultiplier;
-			this._color.blueOffset = color.blueOffset;
-			this._color.greenMultiplier = color.greenMultiplier;
-			this._color.greenOffset = color.greenOffset;
-			this._color.redMultiplier = color.redMultiplier;
-			this._color.redOffset = color.redOffset;
-			
-			this._matrix.translate(-this.refX, -this.refY);
-			//this._matrix.concat(this.getMatrix());
-			this._matrix.concat(m);
-			this._matrix.translate(this.refX, this.refY);
-			//this._matrix.translate(-100, -100);
-			//this._matrix.translate(this.refX, this.refY);
-			this._color.concat(this.colorTransform);
-			
 			this._sourceRect.width = this.bitmapData.width;
 			this._sourceRect.height = this.bitmapData.height;
-			this._destPoint.x = this._matrix.tx;
-			this._destPoint.y = this._matrix.ty;
+			this._destPoint.x = this._matrixConcat.tx;
+			this._destPoint.y = this._matrixConcat.ty;
 			
 			var drawData:BitmapData = this.maskData ? this._combinedData : this.bitmapData;
 			
 			if (
-				this._matrix.a != 1 || this._matrix.b != 0 || this._matrix.c != 0 || this._matrix.d != 1 ||
-				this._color.redMultiplier != 1 || this._color.greenMultiplier != 1 || this._color.blueMultiplier != 1 || this._color.alphaMultiplier != 1 ||
-				this._color.redOffset != 0 || this._color.greenOffset != 0 || this._color.blueOffset != 0 || this._color.alphaOffset != 0 ||
+				this._matrixConcat.a != 1 || this._matrixConcat.b != 0 || this._matrixConcat.c != 0 || this._matrixConcat.d != 1 ||
+				this._colorConcat.redMultiplier != 1 || this._colorConcat.greenMultiplier != 1 || this._colorConcat.blueMultiplier != 1 || this._colorConcat.alphaMultiplier != 1 ||
+				this._colorConcat.redOffset != 0 || this._colorConcat.greenOffset != 0 || this._colorConcat.blueOffset != 0 || this._colorConcat.alphaOffset != 0 ||
 				this.blend != BlendMode.NORMAL
 			)
 			{
-				buffer.draw(drawData, this._matrix, this._color, this.blend, null, this.smooth);
+				buffer.draw(drawData, this._matrixConcat, this._colorConcat, this.blend, null, this.smooth);
 			}
 			else
 			{
