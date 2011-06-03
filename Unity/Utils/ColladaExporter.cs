@@ -6,7 +6,7 @@ using System.Text;
 
 public class ColladaExporter
 {
-	public static void SingleMesh(Mesh mesh, String path)
+	public static void SingleMesh(String path, Mesh mesh)
 	{
 		StringBuilder str;
 		XmlTextWriter xml = new XmlTextWriter(path, Encoding.UTF8);
