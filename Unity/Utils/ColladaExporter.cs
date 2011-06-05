@@ -44,15 +44,15 @@ public class ColladaExporter
 		xml.WriteStartElement("library_geometries");
 
 		xml.WriteStartElement("geometry");
-		xml.WriteAttributeString("id", "NavMesh_001-mesh");
+		xml.WriteAttributeString("id", "Mesh_001-mesh");
 
 		xml.WriteStartElement("mesh");
 
 		xml.WriteStartElement("source");
-		xml.WriteAttributeString("id", "NavMesh_001-mesh-positions");
+		xml.WriteAttributeString("id", "Mesh_001-mesh-positions");
 
 		xml.WriteStartElement("float_array");
-		xml.WriteAttributeString("id", "NavMesh_001-mesh-positions-array");
+		xml.WriteAttributeString("id", "Mesh_001-mesh-positions-array");
 		xml.WriteAttributeString("count", (mesh.vertices.Length * 3).ToString());
 
 		str = new StringBuilder();
@@ -74,7 +74,7 @@ public class ColladaExporter
 		xml.WriteStartElement("technique_common");
 
 		xml.WriteStartElement("accessor");
-		xml.WriteAttributeString("source", "#NavMesh_001-mesh-positions-array");
+		xml.WriteAttributeString("source", "#Mesh_001-mesh-positions-array");
 		xml.WriteAttributeString("count", mesh.vertices.Length.ToString());
 		xml.WriteAttributeString("stride", "3");
 
@@ -98,10 +98,10 @@ public class ColladaExporter
 		xml.WriteEndElement(); // source
 
 		xml.WriteStartElement("source");
-		xml.WriteAttributeString("id", "NavMesh_001-mesh-colors");
+		xml.WriteAttributeString("id", "Mesh_001-mesh-colors");
 
 		xml.WriteStartElement("float_array");
-		xml.WriteAttributeString("id", "NavMesh_001-mesh-colors-array");
+		xml.WriteAttributeString("id", "Mesh_001-mesh-colors-array");
 		xml.WriteAttributeString("count", (mesh.colors.Length * 3).ToString());
 
 		str = new StringBuilder();
@@ -125,7 +125,7 @@ public class ColladaExporter
 		xml.WriteStartElement("technique_common");
 
 		xml.WriteStartElement("accessor");
-		xml.WriteAttributeString("source", "#NavMesh_001-mesh-colors-array");
+		xml.WriteAttributeString("source", "#Mesh_001-mesh-colors-array");
 		xml.WriteAttributeString("count", mesh.colors.Length.ToString());
 		xml.WriteAttributeString("stride", "3");
 
@@ -153,10 +153,10 @@ public class ColladaExporter
 		xml.WriteEndElement(); // source
 
 		xml.WriteStartElement("source");
-		xml.WriteAttributeString("id", "NavMesh_001-mesh-normals");
+		xml.WriteAttributeString("id", "Mesh_001-mesh-normals");
 
 		xml.WriteStartElement("float_array");
-		xml.WriteAttributeString("id", "NavMesh_001-mesh-normals-array");
+		xml.WriteAttributeString("id", "Mesh_001-mesh-normals-array");
 		xml.WriteAttributeString("count", (mesh.normals.Length * 3).ToString());
 
 		str = new StringBuilder();
@@ -178,7 +178,7 @@ public class ColladaExporter
 		xml.WriteStartElement("technique_common");
 
 		xml.WriteStartElement("accessor");
-		xml.WriteAttributeString("source", "#NavMesh_001-mesh-normals-array");
+		xml.WriteAttributeString("source", "#Mesh_001-mesh-normals-array");
 		xml.WriteAttributeString("count", mesh.normals.Length.ToString());
 		xml.WriteAttributeString("stride", "3");
 
@@ -202,21 +202,21 @@ public class ColladaExporter
 		xml.WriteEndElement(); // source
 
 		xml.WriteStartElement("vertices");
-		xml.WriteAttributeString("id", "NavMesh_001-mesh-vertices");
+		xml.WriteAttributeString("id", "Mesh_001-mesh-vertices");
 
 		xml.WriteStartElement("input");
 		xml.WriteAttributeString("semantic", "POSITION");
-		xml.WriteAttributeString("source", "#NavMesh_001-mesh-positions");
+		xml.WriteAttributeString("source", "#Mesh_001-mesh-positions");
 		xml.WriteEndElement();
 
 		xml.WriteStartElement("input");
 		xml.WriteAttributeString("semantic", "NORMAL");
-		xml.WriteAttributeString("source", "#NavMesh_001-mesh-normals");
+		xml.WriteAttributeString("source", "#Mesh_001-mesh-normals");
 		xml.WriteEndElement();
 
 		xml.WriteStartElement("input");
 		xml.WriteAttributeString("semantic", "COLOR");
-		xml.WriteAttributeString("source", "#NavMesh_001-mesh-colors");
+		xml.WriteAttributeString("source", "#Mesh_001-mesh-colors");
 		xml.WriteEndElement();
 
 		xml.WriteEndElement(); // vertices
@@ -226,7 +226,7 @@ public class ColladaExporter
 
 		xml.WriteStartElement("input");
 		xml.WriteAttributeString("semantic", "VERTEX");
-		xml.WriteAttributeString("source", "#NavMesh_001-mesh-vertices");
+		xml.WriteAttributeString("source", "#Mesh_001-mesh-vertices");
 		xml.WriteAttributeString("offset", "0");
 		xml.WriteEndElement();
 
@@ -262,7 +262,7 @@ public class ColladaExporter
 		xml.WriteAttributeString("name", "Scene");
 
 		xml.WriteStartElement("node");
-		xml.WriteAttributeString("id", "NavMesh_001");
+		xml.WriteAttributeString("id", "Mesh_001");
 		xml.WriteAttributeString("type", "Node");
 
 		xml.WriteStartElement("translate");
@@ -289,7 +289,7 @@ public class ColladaExporter
 		xml.WriteEndElement();
 
 		xml.WriteStartElement("instance_geometry");
-		xml.WriteAttributeString("url", "#NavMesh_001-mesh");
+		xml.WriteAttributeString("url", "#Mesh_001-mesh");
 		xml.WriteEndElement();
 
 
