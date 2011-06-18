@@ -1,316 +1,525 @@
 using UnityEngine;
-using UnityEditor;
 using System;
 using System.Xml;
 using System.Text;
 
-public class ColladaExporter
+/**
+ * Collada Exporter
+ * 
+ * @author			Michael Grenier
+ * @author_url		http://mgrenier.me
+ * @copyright		2011 (c) Michael Grenier
+ * @license			MIT - http://www.opensource.org/licenses/MIT
+ * 
+ * @example
+ * 
+ *		ColladaExporter export = new ColladaExporter("path/to/export.dae", replace_or_not);
+ *		export.AddMesh("MyMesh", mesh_object);
+ *		export.Save();
+ * 
+ */
+
+namespace Utils
 {
-	public static void SingleMesh(String path, Mesh mesh)
+	public class ColladaExporter : IDisposable
 	{
-		StringBuilder str;
-		XmlTextWriter xml = new XmlTextWriter(path, Encoding.UTF8);
-		xml.Formatting = Formatting.Indented;
-		xml.WriteStartDocument();
-		xml.WriteStartElement("COLLADA");
-		xml.WriteAttributeString("xmlns", "http://www.collada.org/2005/11/COLLADASchema");
-		xml.WriteAttributeString("version", "1.4.1");
-
-		xml.WriteStartElement("asset");
-		xml.WriteStartElement("contributor");
-		xml.WriteElementString("author", "Unity User");
-		xml.WriteElementString("author_tool", "Unity " + Application.unityVersion);
-		xml.WriteEndElement();
-		xml.WriteElementString("created", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:00"));
-		xml.WriteElementString("modified", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:00"));
-		xml.WriteElementString("up_axis", "Y_UP");
-		xml.WriteEndElement();
-
-		xml.WriteStartElement("library_cameras");
-		xml.WriteEndElement();
-
-		xml.WriteStartElement("library_lights");
-		xml.WriteEndElement();
-
-		xml.WriteStartElement("library_images");
-		xml.WriteEndElement();
-
-		xml.WriteStartElement("library_effects");
-		xml.WriteEndElement();
-
-		xml.WriteStartElement("library_materials");
-		xml.WriteEndElement();
-
-		xml.WriteStartElement("library_geometries");
-
-		xml.WriteStartElement("geometry");
-		xml.WriteAttributeString("id", "Mesh_001-mesh");
-
-		xml.WriteStartElement("mesh");
-
-		xml.WriteStartElement("source");
-		xml.WriteAttributeString("id", "Mesh_001-mesh-positions");
-
-		xml.WriteStartElement("float_array");
-		xml.WriteAttributeString("id", "Mesh_001-mesh-positions-array");
-		xml.WriteAttributeString("count", (mesh.vertices.Length * 3).ToString());
-
-		str = new StringBuilder();
-		for (int i = 0, n = mesh.vertices.Length; i < n; ++i)
+		protected string path;
+		public const string COLLADA = "http://www.collada.org/2005/11/COLLADASchema";
+		public XmlDocument xml
 		{
-			str.Append((-mesh.vertices[i].x).ToString());
-			str.Append(" ");
-			str.Append(mesh.vertices[i].y.ToString());
-			str.Append(" ");
-			str.Append(mesh.vertices[i].z.ToString());
-			if (i + 1 != n)
-				str.Append(" ");
+			get;
+			protected set;
 		}
-		xml.WriteString(str.ToString());
-		str = null;
-
-		xml.WriteEndElement(); // float_array
-
-		xml.WriteStartElement("technique_common");
-
-		xml.WriteStartElement("accessor");
-		xml.WriteAttributeString("source", "#Mesh_001-mesh-positions-array");
-		xml.WriteAttributeString("count", mesh.vertices.Length.ToString());
-		xml.WriteAttributeString("stride", "3");
-
-		xml.WriteStartElement("param");
-		xml.WriteAttributeString("name", "X");
-		xml.WriteAttributeString("type", "float");
-		xml.WriteEndElement();
-		xml.WriteStartElement("param");
-		xml.WriteAttributeString("name", "Y");
-		xml.WriteAttributeString("type", "float");
-		xml.WriteEndElement();
-		xml.WriteStartElement("param");
-		xml.WriteAttributeString("name", "Z");
-		xml.WriteAttributeString("type", "float");
-		xml.WriteEndElement();
-
-		xml.WriteEndElement(); // accessor
-
-		xml.WriteEndElement(); // technique_common
-
-		xml.WriteEndElement(); // source
-
-		xml.WriteStartElement("source");
-		xml.WriteAttributeString("id", "Mesh_001-mesh-colors");
-
-		xml.WriteStartElement("float_array");
-		xml.WriteAttributeString("id", "Mesh_001-mesh-colors-array");
-		xml.WriteAttributeString("count", (mesh.colors.Length * 3).ToString());
-
-		str = new StringBuilder();
-		for (int i = 0, n = mesh.colors.Length; i < n; ++i)
+		public XmlNamespaceManager nsManager
 		{
-			//str.Append(mesh.colors[i].a.ToString());
-			//str.Append(" ");
-			str.Append(mesh.colors[i].r.ToString());
-			str.Append(" ");
-			str.Append(mesh.colors[i].g.ToString());
-			str.Append(" ");
-			str.Append(mesh.colors[i].b.ToString());
-			if (i + 1 != n)
-				str.Append(" ");
+			get;
+			protected set;
 		}
-		xml.WriteString(str.ToString());
-		str = null;
 
-		xml.WriteEndElement(); // float_array
+		protected XmlNode root;
+		protected XmlNode cameras;
+		protected XmlNode lights;
+		protected XmlNode images;
+		protected XmlNode effects;
+		protected XmlNode materials;
+		protected XmlNode geometries;
+		protected XmlNode animations;
+		protected XmlNode controllers;
+		protected XmlNode visual_scenes;
+		protected XmlNode default_scene;
+		protected XmlNode scene;
 
-		xml.WriteStartElement("technique_common");
-
-		xml.WriteStartElement("accessor");
-		xml.WriteAttributeString("source", "#Mesh_001-mesh-colors-array");
-		xml.WriteAttributeString("count", mesh.colors.Length.ToString());
-		xml.WriteAttributeString("stride", "3");
-
-		/*xml.WriteStartElement("param");
-		xml.WriteAttributeString("name", "A");
-		xml.WriteAttributeString("type", "float");
-		xml.WriteEndElement();*/
-		xml.WriteStartElement("param");
-		xml.WriteAttributeString("name", "R");
-		xml.WriteAttributeString("type", "float");
-		xml.WriteEndElement();
-		xml.WriteStartElement("param");
-		xml.WriteAttributeString("name", "G");
-		xml.WriteAttributeString("type", "float");
-		xml.WriteEndElement();
-		xml.WriteStartElement("param");
-		xml.WriteAttributeString("name", "B");
-		xml.WriteAttributeString("type", "float");
-		xml.WriteEndElement();
-
-		xml.WriteEndElement(); // accessor
-
-		xml.WriteEndElement(); // technique_common
-
-		xml.WriteEndElement(); // source
-
-		xml.WriteStartElement("source");
-		xml.WriteAttributeString("id", "Mesh_001-mesh-normals");
-
-		xml.WriteStartElement("float_array");
-		xml.WriteAttributeString("id", "Mesh_001-mesh-normals-array");
-		xml.WriteAttributeString("count", (mesh.normals.Length * 3).ToString());
-
-		str = new StringBuilder();
-		for (int i = 0, n = mesh.normals.Length; i < n; ++i)
+		public ColladaExporter(String path)
+			: this(path, true)
 		{
-			str.Append((-mesh.normals[i].x).ToString());
-			str.Append(" ");
-			str.Append(mesh.normals[i].y.ToString());
-			str.Append(" ");
-			str.Append(mesh.normals[i].z.ToString());
-			if (i + 1 != n)
-				str.Append(" ");
 		}
-		xml.WriteString(str.ToString());
-		str = null;
 
-		xml.WriteEndElement(); // float_array
-
-		xml.WriteStartElement("technique_common");
-
-		xml.WriteStartElement("accessor");
-		xml.WriteAttributeString("source", "#Mesh_001-mesh-normals-array");
-		xml.WriteAttributeString("count", mesh.normals.Length.ToString());
-		xml.WriteAttributeString("stride", "3");
-
-		xml.WriteStartElement("param");
-		xml.WriteAttributeString("name", "X");
-		xml.WriteAttributeString("type", "float");
-		xml.WriteEndElement();
-		xml.WriteStartElement("param");
-		xml.WriteAttributeString("name", "Y");
-		xml.WriteAttributeString("type", "float");
-		xml.WriteEndElement();
-		xml.WriteStartElement("param");
-		xml.WriteAttributeString("name", "Z");
-		xml.WriteAttributeString("type", "float");
-		xml.WriteEndElement();
-
-		xml.WriteEndElement(); // accessor
-
-		xml.WriteEndElement(); // technique_common
-
-		xml.WriteEndElement(); // source
-
-		xml.WriteStartElement("vertices");
-		xml.WriteAttributeString("id", "Mesh_001-mesh-vertices");
-
-		xml.WriteStartElement("input");
-		xml.WriteAttributeString("semantic", "POSITION");
-		xml.WriteAttributeString("source", "#Mesh_001-mesh-positions");
-		xml.WriteEndElement();
-
-		xml.WriteStartElement("input");
-		xml.WriteAttributeString("semantic", "NORMAL");
-		xml.WriteAttributeString("source", "#Mesh_001-mesh-normals");
-		xml.WriteEndElement();
-
-		xml.WriteStartElement("input");
-		xml.WriteAttributeString("semantic", "COLOR");
-		xml.WriteAttributeString("source", "#Mesh_001-mesh-colors");
-		xml.WriteEndElement();
-
-		xml.WriteEndElement(); // vertices
-
-		xml.WriteStartElement("triangles");
-		xml.WriteAttributeString("count", (mesh.triangles.Length / 3).ToString());
-
-		xml.WriteStartElement("input");
-		xml.WriteAttributeString("semantic", "VERTEX");
-		xml.WriteAttributeString("source", "#Mesh_001-mesh-vertices");
-		xml.WriteAttributeString("offset", "0");
-		xml.WriteEndElement();
-
-		str = new StringBuilder();
-		//for (int i = 0, n = mesh.triangles.Length; i < n; ++i)
-		for (int i = mesh.triangles.Length - 1; i >= 0; --i)
+		public ColladaExporter(String path, bool replace)
 		{
-			str.Append(mesh.triangles[i].ToString());
-			str.Append(" ");
+			this.path = path;
+			this.xml = new XmlDocument();
+
+			this.nsManager = new XmlNamespaceManager(this.xml.NameTable);
+			this.nsManager.AddNamespace("x", COLLADA);
+
+			if (!replace)
+			{
+				try
+				{
+					XmlTextReader reader = new XmlTextReader(path);
+					this.xml.Load(reader);
+					reader.Close();
+					reader = null;
+				}
+				catch (Exception e)
+				{
+					Debug.LogError(e.Message);
+				}
+			}
+			else
+				this.xml.AppendChild(this.xml.CreateXmlDeclaration("1.0", "UTF-8", null));
+
+			XmlAttribute attr;
+
+			this.root = this.xml.SelectSingleNode("/x:COLLADA", this.nsManager);
+			if (this.root == null)
+			{
+				this.root = this.xml.AppendChild(this.xml.CreateElement("COLLADA", COLLADA));
+				attr = this.xml.CreateAttribute("version");
+				attr.Value = "1.4.1";
+				this.root.Attributes.Append(attr);
+			}
+
+			XmlNode node;
+
+			// Create asset
+			{
+				node = this.root.SelectSingleNode("/x:asset", this.nsManager);
+				if (node == null)
+				{
+					this.root
+						.AppendChild(
+							this.xml.CreateElement("asset", COLLADA)
+								.AppendChild(
+									this.xml.CreateElement("contributor", COLLADA)
+										.AppendChild(
+											this.xml.CreateElement("author", COLLADA)
+												.AppendChild(this.xml.CreateTextNode("Unity3D User"))
+												.ParentNode
+										)
+										.ParentNode
+										.AppendChild(
+											this.xml.CreateElement("author_tool", COLLADA)
+												.AppendChild(this.xml.CreateTextNode("Unity " + Application.unityVersion))
+												.ParentNode
+										)
+										.ParentNode
+								)
+								.ParentNode
+								.AppendChild(
+									this.xml.CreateElement("created", COLLADA)
+										.AppendChild(this.xml.CreateTextNode(DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:00")))
+										.ParentNode
+								)
+								.ParentNode
+								.AppendChild(
+									this.xml.CreateElement("modified", COLLADA)
+										.AppendChild(this.xml.CreateTextNode(DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:00")))
+										.ParentNode
+								)
+								.ParentNode
+								.AppendChild(
+									this.xml.CreateElement("up_axis", COLLADA)
+										.AppendChild(this.xml.CreateTextNode("Y_UP"))
+										.ParentNode
+								)
+								.ParentNode
+						);
+				}
+			}
+
+			// Create libraries
+			this.cameras = this.root.SelectSingleNode("/x:library_cameras", this.nsManager);
+			if (this.cameras == null)
+				this.cameras = this.root.AppendChild(this.xml.CreateElement("library_cameras", COLLADA));
+			this.lights = this.root.SelectSingleNode("/x:library_lights", this.nsManager);
+			if (this.lights == null)
+				this.lights = this.root.AppendChild(this.xml.CreateElement("library_lights", COLLADA));
+			this.images = this.root.SelectSingleNode("/x:library_images", this.nsManager);
+			if (this.images == null)
+				this.images = this.root.AppendChild(this.xml.CreateElement("library_images", COLLADA));
+			this.effects = this.root.SelectSingleNode("/x:library_effects", this.nsManager);
+			if (this.effects == null)
+				this.effects = this.root.AppendChild(this.xml.CreateElement("library_effects", COLLADA));
+			this.materials = this.root.SelectSingleNode("/x:library_materials", this.nsManager);
+			if (this.materials == null)
+				this.materials = this.root.AppendChild(this.xml.CreateElement("library_materials", COLLADA));
+			this.geometries = this.root.SelectSingleNode("/x:library_geometries", this.nsManager);
+			if (this.geometries == null)
+				this.geometries = this.root.AppendChild(this.xml.CreateElement("library_geometries", COLLADA));
+			this.animations = this.root.SelectSingleNode("/x:library_animations", this.nsManager);
+			if (this.animations == null)
+				this.animations = this.root.AppendChild(this.xml.CreateElement("library_animations", COLLADA));
+			this.controllers = this.root.SelectSingleNode("/x:library_controllers", this.nsManager);
+			if (this.controllers == null)
+				this.controllers = this.root.AppendChild(this.xml.CreateElement("library_controllers", COLLADA));
+			this.visual_scenes = this.root.SelectSingleNode("/x:library_visual_scenes", this.nsManager);
+			if (this.visual_scenes == null)
+			{
+				this.visual_scenes = this.root.AppendChild(this.xml.CreateElement("library_visual_scenes", COLLADA));
+				this.default_scene = this.visual_scenes.AppendChild(this.xml.CreateElement("visual_scene", COLLADA));
+				attr = this.xml.CreateAttribute("id");
+				attr.Value = "Scene";
+				this.default_scene.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("name");
+				attr.Value = "Scene";
+				this.default_scene.Attributes.Append(attr);
+			}
+			this.scene = this.root.SelectSingleNode("/x:library_scene", this.nsManager);
+			if (this.scene == null)
+			{
+				this.scene = this.root.AppendChild(this.xml.CreateElement("scene", COLLADA));
+				node = this.scene.AppendChild(this.xml.CreateElement("instance_visual_scene", COLLADA));
+				attr = this.xml.CreateAttribute("url");
+				attr.Value = "#Scene";
+				node.Attributes.Append(attr);
+			}
 		}
-		xml.WriteElementString("p", str.ToString());
-		str = null;
 
-		xml.WriteEndElement(); // triangles
+		public void Dispose()
+		{
+		}
 
+		public void Save()
+		{
+			this.xml.Save(this.path);
+		}
 
-		xml.WriteEndElement(); // mesh
+		public void AddMesh(string name, Mesh sourceMesh)
+		{
+			XmlNode geometry = this.geometries.AppendChild(this.xml.CreateElement("geometry", COLLADA));
+			XmlNode mesh = geometry.AppendChild(this.xml.CreateElement("mesh", COLLADA));
+			XmlNode nodeA, nodeB, nodeC, nodeD;
+			XmlAttribute attr;
+			StringBuilder str;
 
-		xml.WriteEndElement(); // geometry
+			attr = this.xml.CreateAttribute("id");
+			attr.Value = name + "-mesh";
+			geometry.Attributes.Append(attr);
 
-		xml.WriteEndElement(); // library_geometries
+			// Positions
+			if (sourceMesh.vertexCount > 0 )
+			{
+				nodeA = mesh.AppendChild(this.xml.CreateElement("source", COLLADA));
+				attr = this.xml.CreateAttribute("id");
+				attr.Value = name + "-mesh-positions";
+				nodeA.Attributes.Append(attr);
 
-		xml.WriteStartElement("library_animations");
-		xml.WriteEndElement();
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("float_array", COLLADA));
+				attr = this.xml.CreateAttribute("id");
+				attr.Value = name + "-mesh-positions-array";
+				nodeB.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("count");
+				attr.Value = (sourceMesh.vertexCount * 3).ToString();
+				nodeB.Attributes.Append(attr);
 
-		xml.WriteStartElement("library_controllers");
-		xml.WriteEndElement();
+				str = new StringBuilder();
+				for (int i = 0, n = sourceMesh.vertexCount; i < n; ++i)
+				{
+					str.Append((-sourceMesh.vertices[i].x).ToString());
+					str.Append(" ");
+					str.Append(sourceMesh.vertices[i].y.ToString());
+					str.Append(" ");
+					str.Append(sourceMesh.vertices[i].z.ToString());
+					if (i + 1 != n)
+						str.Append(" ");
+				}
+				nodeB.AppendChild(this.xml.CreateTextNode(str.ToString()));
+				str = null;
 
-		xml.WriteStartElement("library_visual_scenes");
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("technique_common", COLLADA));
+				nodeC = nodeB.AppendChild(this.xml.CreateElement("accessor", COLLADA));
+				attr = this.xml.CreateAttribute("source");
+				attr.Value = "#" + name + "-mesh-positions-array";
+				nodeC.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("count");
+				attr.Value = sourceMesh.vertexCount.ToString();
+				nodeC.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("stride");
+				attr.Value = "3";
+				nodeC.Attributes.Append(attr);
+				nodeD = nodeC.AppendChild(this.xml.CreateElement("param", COLLADA));
+				attr = this.xml.CreateAttribute("name");
+				attr.Value = "X";
+				nodeD.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("type");
+				attr.Value = "float";
+				nodeD.Attributes.Append(attr);
+				nodeD = nodeC.AppendChild(this.xml.CreateElement("param", COLLADA));
+				attr = this.xml.CreateAttribute("name");
+				attr.Value = "Y";
+				nodeD.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("type");
+				attr.Value = "float";
+				nodeD.Attributes.Append(attr);
+				nodeD = nodeC.AppendChild(this.xml.CreateElement("param", COLLADA));
+				attr = this.xml.CreateAttribute("name");
+				attr.Value = "Z";
+				nodeD.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("type");
+				attr.Value = "float";
+				nodeD.Attributes.Append(attr);
+			}
 
-		xml.WriteStartElement("visual_scene");
-		xml.WriteAttributeString("id", "Scene");
-		xml.WriteAttributeString("name", "Scene");
+			// Colors
+			if (sourceMesh.colors.Length > 0)
+			{
+				nodeA = mesh.AppendChild(this.xml.CreateElement("source", COLLADA));
+				attr = this.xml.CreateAttribute("id");
+				attr.Value = name + "-mesh-colors";
+				nodeA.Attributes.Append(attr);
 
-		xml.WriteStartElement("node");
-		xml.WriteAttributeString("id", "Mesh_001");
-		xml.WriteAttributeString("type", "Node");
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("float_array", COLLADA));
+				attr = this.xml.CreateAttribute("id");
+				attr.Value = name + "-mesh-colors-array";
+				nodeB.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("count");
+				attr.Value = (sourceMesh.colors.Length * 3).ToString();
+				nodeB.Attributes.Append(attr);
 
-		xml.WriteStartElement("translate");
-		xml.WriteAttributeString("sid", "location");
-		xml.WriteString("0 0 0");
-		xml.WriteEndElement();
+				str = new StringBuilder();
+				for (int i = 0, n = sourceMesh.colors.Length; i < n; ++i)
+				{
+					//str.Append(mesh.colors[i].a.ToString());
+					//str.Append(" ");
+					str.Append(sourceMesh.colors[i].r.ToString());
+					str.Append(" ");
+					str.Append(sourceMesh.colors[i].g.ToString());
+					str.Append(" ");
+					str.Append(sourceMesh.colors[i].b.ToString());
+					if (i + 1 != n)
+						str.Append(" ");
+				}
+				nodeB.AppendChild(this.xml.CreateTextNode(str.ToString()));
+				str = null;
 
-		xml.WriteStartElement("rotate");
-		xml.WriteAttributeString("sid", "rotationZ");
-		xml.WriteString("0 0 1 0");
-		xml.WriteEndElement();
-		xml.WriteStartElement("rotate");
-		xml.WriteAttributeString("sid", "rotationY");
-		xml.WriteString("0 1 0 0");
-		xml.WriteEndElement();
-		xml.WriteStartElement("rotate");
-		xml.WriteAttributeString("sid", "rotationX");
-		xml.WriteString("1 0 0 0");
-		xml.WriteEndElement();
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("technique_common", COLLADA));
+				nodeC = nodeB.AppendChild(this.xml.CreateElement("accessor", COLLADA));
+				attr = this.xml.CreateAttribute("source");
+				attr.Value = "#" + name + "-mesh-colors-array";
+				nodeC.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("count");
+				attr.Value = sourceMesh.colors.Length.ToString();
+				nodeC.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("stride");
+				attr.Value = "3";
+				nodeC.Attributes.Append(attr);
+				nodeD = nodeC.AppendChild(this.xml.CreateElement("param", COLLADA));
+				attr = this.xml.CreateAttribute("name");
+				attr.Value = "R";
+				nodeD.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("type");
+				attr.Value = "float";
+				nodeD.Attributes.Append(attr);
+				nodeD = nodeC.AppendChild(this.xml.CreateElement("param", COLLADA));
+				attr = this.xml.CreateAttribute("name");
+				attr.Value = "G";
+				nodeD.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("type");
+				attr.Value = "float";
+				nodeD.Attributes.Append(attr);
+				nodeD = nodeC.AppendChild(this.xml.CreateElement("param", COLLADA));
+				attr = this.xml.CreateAttribute("name");
+				attr.Value = "B";
+				nodeD.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("type");
+				attr.Value = "float";
+				nodeD.Attributes.Append(attr);
+			}
 
-		xml.WriteStartElement("scale");
-		xml.WriteAttributeString("sid", "scale");
-		xml.WriteString("1 1 1");
-		xml.WriteEndElement();
+			// Normals
+			if (sourceMesh.normals.Length > 0)
+			{
+				nodeA = mesh.AppendChild(this.xml.CreateElement("source", COLLADA));
+				attr = this.xml.CreateAttribute("id");
+				attr.Value = name + "-mesh-normals";
+				nodeA.Attributes.Append(attr);
 
-		xml.WriteStartElement("instance_geometry");
-		xml.WriteAttributeString("url", "#Mesh_001-mesh");
-		xml.WriteEndElement();
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("float_array", COLLADA));
+				attr = this.xml.CreateAttribute("id");
+				attr.Value = name + "-mesh-normals-array";
+				nodeB.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("count");
+				attr.Value = (sourceMesh.normals.Length * 3).ToString();
+				nodeB.Attributes.Append(attr);
 
+				str = new StringBuilder();
+				for (int i = 0, n = sourceMesh.normals.Length; i < n; ++i)
+				{
+					str.Append((-sourceMesh.normals[i].x).ToString());
+					str.Append(" ");
+					str.Append(sourceMesh.normals[i].y.ToString());
+					str.Append(" ");
+					str.Append(sourceMesh.normals[i].z.ToString());
+					if (i + 1 != n)
+						str.Append(" ");
+				}
+				nodeB.AppendChild(this.xml.CreateTextNode(str.ToString()));
+				str = null;
 
-		xml.WriteEndElement(); // node
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("technique_common", COLLADA));
+				nodeC = nodeB.AppendChild(this.xml.CreateElement("accessor", COLLADA));
+				attr = this.xml.CreateAttribute("source");
+				attr.Value = "#" + name + "-mesh-normals-array";
+				nodeC.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("count");
+				attr.Value = sourceMesh.normals.Length.ToString();
+				nodeC.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("stride");
+				attr.Value = "3";
+				nodeC.Attributes.Append(attr);
+				nodeD = nodeC.AppendChild(this.xml.CreateElement("param", COLLADA));
+				attr = this.xml.CreateAttribute("name");
+				attr.Value = "X";
+				nodeD.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("type");
+				attr.Value = "float";
+				nodeD.Attributes.Append(attr);
+				nodeD = nodeC.AppendChild(this.xml.CreateElement("param", COLLADA));
+				attr = this.xml.CreateAttribute("name");
+				attr.Value = "Y";
+				nodeD.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("type");
+				attr.Value = "float";
+				nodeD.Attributes.Append(attr);
+				nodeD = nodeC.AppendChild(this.xml.CreateElement("param", COLLADA));
+				attr = this.xml.CreateAttribute("name");
+				attr.Value = "Z";
+				nodeD.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("type");
+				attr.Value = "float";
+				nodeD.Attributes.Append(attr);
+			}
 
-		xml.WriteEndElement(); // visual_scene
+			// Vertices
+			{
+				nodeA = mesh.AppendChild(this.xml.CreateElement("vertices", COLLADA));
+				attr = this.xml.CreateAttribute("id");
+				attr.Value = name + "-mesh-vertices";
+				nodeA.Attributes.Append(attr);
 
-		xml.WriteEndElement(); // library_visuel_scenes
+				if (sourceMesh.vertexCount > 0)
+				{
+					nodeB = nodeA.AppendChild(this.xml.CreateElement("input", COLLADA));
+					attr = this.xml.CreateAttribute("semantic");
+					attr.Value = "POSITION";
+					nodeB.Attributes.Append(attr);
+					attr = this.xml.CreateAttribute("source");
+					attr.Value = "#" + name + "-mesh-positions";
+					nodeB.Attributes.Append(attr);
+				}
 
-		xml.WriteStartElement("scene");
+				if (sourceMesh.normals.Length > 0)
+				{
+					nodeB = nodeA.AppendChild(this.xml.CreateElement("input", COLLADA));
+					attr = this.xml.CreateAttribute("semantic");
+					attr.Value = "NORMAL";
+					nodeB.Attributes.Append(attr);
+					attr = this.xml.CreateAttribute("source");
+					attr.Value = "#" + name + "-mesh-normals";
+					nodeB.Attributes.Append(attr);
+				}
 
-		xml.WriteStartElement("instance_visual_scene");
-		xml.WriteAttributeString("url", "#Scene");
-		xml.WriteEndElement();
+				if (sourceMesh.colors.Length > 0)
+				{
+					nodeB = nodeA.AppendChild(this.xml.CreateElement("input", COLLADA));
+					attr = this.xml.CreateAttribute("semantic");
+					attr.Value = "COLOR";
+					nodeB.Attributes.Append(attr);
+					attr = this.xml.CreateAttribute("source");
+					attr.Value = "#" + name + "-mesh-colors";
+					nodeB.Attributes.Append(attr);
+				}
+			}
 
-		xml.WriteEndElement();
+			// Triangles
+			{
+				nodeA = mesh.AppendChild(this.xml.CreateElement("triangles", COLLADA));
+				attr = this.xml.CreateAttribute("count");
+				attr.Value = (sourceMesh.triangles.Length / 3).ToString();
+				nodeA.Attributes.Append(attr);
 
-		xml.WriteEndElement();
-		xml.WriteEndDocument();
-		xml.Close();
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("input", COLLADA));
+				attr = this.xml.CreateAttribute("semantic");
+				attr.Value = "VERTEX";
+				nodeB.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("source");
+				attr.Value = "#" + name + "-mesh-vertices";
+				nodeB.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("offset");
+				attr.Value = "0";
+				nodeB.Attributes.Append(attr);
+
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("p", COLLADA));
+
+				str = new StringBuilder();
+				//for (int i = 0, n = mesh.triangles.Length; i < n; ++i)
+				for (int i = sourceMesh.triangles.Length - 1; i >= 0; --i)
+				{
+					str.Append(sourceMesh.triangles[i].ToString());
+					if (i != 0)
+						str.Append(" ");
+				}
+
+				nodeB.AppendChild(this.xml.CreateTextNode(str.ToString()));
+				str = null;
+			}
+
+			// Add to default scene
+			{
+				nodeA = this.default_scene.AppendChild(this.xml.CreateElement("node", COLLADA));
+				attr = this.xml.CreateAttribute("id");
+				attr.Value = name;
+				nodeA.Attributes.Append(attr);
+				attr = this.xml.CreateAttribute("type");
+				attr.Value = "Node";
+				nodeA.Attributes.Append(attr);
+
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("translate", COLLADA));
+				attr = this.xml.CreateAttribute("sid");
+				attr.Value = "location";
+				nodeB.Attributes.Append(attr);
+				nodeB.AppendChild(this.xml.CreateTextNode("0 0 0"));
+
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("rotate", COLLADA));
+				attr = this.xml.CreateAttribute("sid");
+				attr.Value = "rotationZ";
+				nodeB.Attributes.Append(attr);
+				nodeB.AppendChild(this.xml.CreateTextNode("0 0 1 0"));
+
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("rotate", COLLADA));
+				attr = this.xml.CreateAttribute("sid");
+				attr.Value = "rotationY";
+				nodeB.Attributes.Append(attr);
+				nodeB.AppendChild(this.xml.CreateTextNode("0 1 0 0"));
+
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("rotate", COLLADA));
+				attr = this.xml.CreateAttribute("sid");
+				attr.Value = "rotationX";
+				nodeB.Attributes.Append(attr);
+				nodeB.AppendChild(this.xml.CreateTextNode("1 0 0 0"));
+
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("scale", COLLADA));
+				attr = this.xml.CreateAttribute("sid");
+				attr.Value = "scale";
+				nodeB.Attributes.Append(attr);
+				nodeB.AppendChild(this.xml.CreateTextNode("1 1 1"));
+
+				nodeB = nodeA.AppendChild(this.xml.CreateElement("instance_geometry", COLLADA));
+				attr = this.xml.CreateAttribute("url");
+				attr.Value = "#"+name+"-mesh";
+				nodeB.Attributes.Append(attr);
+			}
+		}
 	}
-
-
 }
