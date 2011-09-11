@@ -7,7 +7,7 @@ using System.Xml;
 
 class SceneExporter : EditorWindow
 {
-	[MenuItem("Tool/Export scene...")]
+	[MenuItem("Tools/Export scene...")]
 	static public void ExportScene()
 	{
 		List<GameObject> root = new List<GameObject>();
@@ -21,7 +21,7 @@ class SceneExporter : EditorWindow
 		);
 	}
 
-	[MenuItem("Tool/Export selected...")]
+	[MenuItem("Tools/Export selected...")]
 	static public void ExportSelected()
 	{
 		List<GameObject> selected = new List<GameObject>();
