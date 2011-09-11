@@ -1,9 +1,19 @@
-﻿using UnityEditor;
+using UnityEditor;
 using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
+
+/**
+ * Scene Exporter
+ * 
+ * @author			Michael Grenier
+ * @author_url		http://mgrenier.me
+ * @copyright		2011 (c) Michael Grenier
+ * @license			MIT - http://www.opensource.org/licenses/MIT
+ * 
+ */
 
 class SceneExporter : EditorWindow
 {
