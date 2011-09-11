@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using System.Xml;
 using System.Text;
@@ -14,7 +14,8 @@ using System.Text;
  * @example
  * 
  *		ColladaExporter export = new ColladaExporter("path/to/export.dae", replace_or_not);
- *		export.AddMesh("MyMesh", mesh_object);
+ *		export.AddGeometry("MyMeshId", mesh_object);
+ *		export.AddGeometryToScene("MyMeshId", "MyMeshName");
  *		export.Save();
  * 
  */
@@ -195,7 +196,7 @@ namespace Utils
 			this.xml.Save(this.path);
 		}
 
-		public void AddMesh(string name, Mesh sourceMesh)
+		public XmlNode AddGeometry(string id, Mesh sourceMesh)
 		{
 			XmlNode geometry = this.geometries.AppendChild(this.xml.CreateElement("geometry", COLLADA));
 			XmlNode mesh = geometry.AppendChild(this.xml.CreateElement("mesh", COLLADA));
@@ -204,7 +205,7 @@ namespace Utils
 			StringBuilder str;
 
 			attr = this.xml.CreateAttribute("id");
-			attr.Value = name + "-mesh";
+			attr.Value = id + "-mesh";
 			geometry.Attributes.Append(attr);
 
 			// Positions
@@ -212,12 +213,12 @@ namespace Utils
 			{
 				nodeA = mesh.AppendChild(this.xml.CreateElement("source", COLLADA));
 				attr = this.xml.CreateAttribute("id");
-				attr.Value = name + "-mesh-positions";
+				attr.Value = id + "-mesh-positions";
 				nodeA.Attributes.Append(attr);
 
 				nodeB = nodeA.AppendChild(this.xml.CreateElement("float_array", COLLADA));
 				attr = this.xml.CreateAttribute("id");
-				attr.Value = name + "-mesh-positions-array";
+				attr.Value = id + "-mesh-positions-array";
 				nodeB.Attributes.Append(attr);
 				attr = this.xml.CreateAttribute("count");
 				attr.Value = (sourceMesh.vertexCount * 3).ToString();
@@ -240,7 +241,7 @@ namespace Utils
 				nodeB = nodeA.AppendChild(this.xml.CreateElement("technique_common", COLLADA));
 				nodeC = nodeB.AppendChild(this.xml.CreateElement("accessor", COLLADA));
 				attr = this.xml.CreateAttribute("source");
-				attr.Value = "#" + name + "-mesh-positions-array";
+				attr.Value = "#" + id + "-mesh-positions-array";
 				nodeC.Attributes.Append(attr);
 				attr = this.xml.CreateAttribute("count");
 				attr.Value = sourceMesh.vertexCount.ToString();
@@ -276,12 +277,12 @@ namespace Utils
 			{
 				nodeA = mesh.AppendChild(this.xml.CreateElement("source", COLLADA));
 				attr = this.xml.CreateAttribute("id");
-				attr.Value = name + "-mesh-colors";
+				attr.Value = id + "-mesh-colors";
 				nodeA.Attributes.Append(attr);
 
 				nodeB = nodeA.AppendChild(this.xml.CreateElement("float_array", COLLADA));
 				attr = this.xml.CreateAttribute("id");
-				attr.Value = name + "-mesh-colors-array";
+				attr.Value = id + "-mesh-colors-array";
 				nodeB.Attributes.Append(attr);
 				attr = this.xml.CreateAttribute("count");
 				attr.Value = (sourceMesh.colors.Length * 3).ToString();
@@ -306,7 +307,7 @@ namespace Utils
 				nodeB = nodeA.AppendChild(this.xml.CreateElement("technique_common", COLLADA));
 				nodeC = nodeB.AppendChild(this.xml.CreateElement("accessor", COLLADA));
 				attr = this.xml.CreateAttribute("source");
-				attr.Value = "#" + name + "-mesh-colors-array";
+				attr.Value = "#" + id + "-mesh-colors-array";
 				nodeC.Attributes.Append(attr);
 				attr = this.xml.CreateAttribute("count");
 				attr.Value = sourceMesh.colors.Length.ToString();
@@ -342,12 +343,12 @@ namespace Utils
 			{
 				nodeA = mesh.AppendChild(this.xml.CreateElement("source", COLLADA));
 				attr = this.xml.CreateAttribute("id");
-				attr.Value = name + "-mesh-normals";
+				attr.Value = id + "-mesh-normals";
 				nodeA.Attributes.Append(attr);
 
 				nodeB = nodeA.AppendChild(this.xml.CreateElement("float_array", COLLADA));
 				attr = this.xml.CreateAttribute("id");
-				attr.Value = name + "-mesh-normals-array";
+				attr.Value = id + "-mesh-normals-array";
 				nodeB.Attributes.Append(attr);
 				attr = this.xml.CreateAttribute("count");
 				attr.Value = (sourceMesh.normals.Length * 3).ToString();
@@ -370,7 +371,7 @@ namespace Utils
 				nodeB = nodeA.AppendChild(this.xml.CreateElement("technique_common", COLLADA));
 				nodeC = nodeB.AppendChild(this.xml.CreateElement("accessor", COLLADA));
 				attr = this.xml.CreateAttribute("source");
-				attr.Value = "#" + name + "-mesh-normals-array";
+				attr.Value = "#" + id + "-mesh-normals-array";
 				nodeC.Attributes.Append(attr);
 				attr = this.xml.CreateAttribute("count");
 				attr.Value = sourceMesh.normals.Length.ToString();
@@ -405,7 +406,7 @@ namespace Utils
 			{
 				nodeA = mesh.AppendChild(this.xml.CreateElement("vertices", COLLADA));
 				attr = this.xml.CreateAttribute("id");
-				attr.Value = name + "-mesh-vertices";
+				attr.Value = id + "-mesh-vertices";
 				nodeA.Attributes.Append(attr);
 
 				if (sourceMesh.vertexCount > 0)
@@ -415,7 +416,7 @@ namespace Utils
 					attr.Value = "POSITION";
 					nodeB.Attributes.Append(attr);
 					attr = this.xml.CreateAttribute("source");
-					attr.Value = "#" + name + "-mesh-positions";
+					attr.Value = "#" + id + "-mesh-positions";
 					nodeB.Attributes.Append(attr);
 				}
 
@@ -426,7 +427,7 @@ namespace Utils
 					attr.Value = "NORMAL";
 					nodeB.Attributes.Append(attr);
 					attr = this.xml.CreateAttribute("source");
-					attr.Value = "#" + name + "-mesh-normals";
+					attr.Value = "#" + id + "-mesh-normals";
 					nodeB.Attributes.Append(attr);
 				}
 
@@ -437,7 +438,7 @@ namespace Utils
 					attr.Value = "COLOR";
 					nodeB.Attributes.Append(attr);
 					attr = this.xml.CreateAttribute("source");
-					attr.Value = "#" + name + "-mesh-colors";
+					attr.Value = "#" + id + "-mesh-colors";
 					nodeB.Attributes.Append(attr);
 				}
 			}
@@ -454,7 +455,7 @@ namespace Utils
 				attr.Value = "VERTEX";
 				nodeB.Attributes.Append(attr);
 				attr = this.xml.CreateAttribute("source");
-				attr.Value = "#" + name + "-mesh-vertices";
+				attr.Value = "#" + id + "-mesh-vertices";
 				nodeB.Attributes.Append(attr);
 				attr = this.xml.CreateAttribute("offset");
 				attr.Value = "0";
@@ -475,51 +476,89 @@ namespace Utils
 				str = null;
 			}
 
-			// Add to default scene
-			{
-				nodeA = this.default_scene.AppendChild(this.xml.CreateElement("node", COLLADA));
-				attr = this.xml.CreateAttribute("id");
-				attr.Value = name;
-				nodeA.Attributes.Append(attr);
-				attr = this.xml.CreateAttribute("type");
-				attr.Value = "Node";
-				nodeA.Attributes.Append(attr);
-
-				nodeB = nodeA.AppendChild(this.xml.CreateElement("translate", COLLADA));
-				attr = this.xml.CreateAttribute("sid");
-				attr.Value = "location";
-				nodeB.Attributes.Append(attr);
-				nodeB.AppendChild(this.xml.CreateTextNode("0 0 0"));
-
-				nodeB = nodeA.AppendChild(this.xml.CreateElement("rotate", COLLADA));
-				attr = this.xml.CreateAttribute("sid");
-				attr.Value = "rotationZ";
-				nodeB.Attributes.Append(attr);
-				nodeB.AppendChild(this.xml.CreateTextNode("0 0 1 0"));
-
-				nodeB = nodeA.AppendChild(this.xml.CreateElement("rotate", COLLADA));
-				attr = this.xml.CreateAttribute("sid");
-				attr.Value = "rotationY";
-				nodeB.Attributes.Append(attr);
-				nodeB.AppendChild(this.xml.CreateTextNode("0 1 0 0"));
-
-				nodeB = nodeA.AppendChild(this.xml.CreateElement("rotate", COLLADA));
-				attr = this.xml.CreateAttribute("sid");
-				attr.Value = "rotationX";
-				nodeB.Attributes.Append(attr);
-				nodeB.AppendChild(this.xml.CreateTextNode("1 0 0 0"));
-
-				nodeB = nodeA.AppendChild(this.xml.CreateElement("scale", COLLADA));
-				attr = this.xml.CreateAttribute("sid");
-				attr.Value = "scale";
-				nodeB.Attributes.Append(attr);
-				nodeB.AppendChild(this.xml.CreateTextNode("1 1 1"));
-
-				nodeB = nodeA.AppendChild(this.xml.CreateElement("instance_geometry", COLLADA));
-				attr = this.xml.CreateAttribute("url");
-				attr.Value = "#"+name+"-mesh";
-				nodeB.Attributes.Append(attr);
-			}
+			return geometry;
 		}
+
+		public XmlNode AddGeometryToScene(string id, string name)
+		{
+			return AddGeometryToScene(id, name, Matrix4x4.identity, null);
+		}
+
+		public XmlNode AddGeometryToScene(string id, string name, Matrix4x4 matrix)
+		{
+			return AddGeometryToScene(id, name, matrix, null);
+		}
+
+		public XmlNode AddGeometryToScene(string id, string name, Matrix4x4 matrix, XmlNode parent)
+		{
+			XmlNode nodeA, nodeB;
+			XmlAttribute attr;
+
+			if (parent == null)
+				parent = this.default_scene;
+
+			nodeA = parent.AppendChild(this.xml.CreateElement("node", COLLADA));
+			attr = this.xml.CreateAttribute("id");
+			attr.Value = id;
+			nodeA.Attributes.Append(attr);
+			attr = this.xml.CreateAttribute("type");
+			attr.Value = "Node";
+			nodeA.Attributes.Append(attr);
+			attr = this.xml.CreateAttribute("name");
+			attr.Value = name;
+			nodeA.Attributes.Append(attr);
+
+			nodeB = nodeA.AppendChild(this.xml.CreateElement("matrix", COLLADA));
+			attr = this.xml.CreateAttribute("sid");
+			attr.Value = "matrix";
+			nodeB.Attributes.Append(attr);
+			nodeB.AppendChild(this.xml.CreateTextNode(matrix.ToString()));
+
+			nodeB = nodeA.AppendChild(this.xml.CreateElement("instance_geometry", COLLADA));
+			attr = this.xml.CreateAttribute("url");
+			attr.Value = "#"+id+"-mesh";
+			nodeB.Attributes.Append(attr);
+
+			return nodeA;
+		}
+
+		public XmlNode AddEmptyToScene(string id, string name)
+		{
+			return AddEmptyToScene(id, name, Matrix4x4.identity, null);
+		}
+
+		public XmlNode AddEmptyToScene(string id, string name, Matrix4x4 matrix)
+		{
+			return AddEmptyToScene(id, name, matrix, null);
+		}
+
+		public XmlNode AddEmptyToScene(string id, string name, Matrix4x4 matrix, XmlNode parent)
+		{
+			XmlNode nodeA, nodeB;
+			XmlAttribute attr;
+
+			if (parent == null)
+				parent = this.default_scene;
+
+			nodeA = parent.AppendChild(this.xml.CreateElement("node", COLLADA));
+			attr = this.xml.CreateAttribute("id");
+			attr.Value = id;
+			nodeA.Attributes.Append(attr);
+			attr = this.xml.CreateAttribute("type");
+			attr.Value = "Node";
+			nodeA.Attributes.Append(attr);
+			attr = this.xml.CreateAttribute("name");
+			attr.Value = name;
+			nodeA.Attributes.Append(attr);
+
+			nodeB = nodeA.AppendChild(this.xml.CreateElement("matrix", COLLADA));
+			attr = this.xml.CreateAttribute("sid");
+			attr.Value = "matrix";
+			nodeB.Attributes.Append(attr);
+			nodeB.AppendChild(this.xml.CreateTextNode(matrix.ToString()));
+
+			return nodeA;
+		}
+
 	}
 }
