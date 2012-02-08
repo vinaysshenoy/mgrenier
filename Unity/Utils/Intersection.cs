@@ -9,6 +9,11 @@ class Intersection
 		return bound.Contains(point);
 	}
 
+	static public bool BoundBoundCheck(Bounds bound1, Bounds bound2)
+	{
+		return bound1.Intersects(bound2);
+	}
+
 	static public bool TriangleBoundCheck(Vector3[] tri, Bounds bound)
 	{
 		return TriangleBoundCheck(tri, bound.center, bound.size);
