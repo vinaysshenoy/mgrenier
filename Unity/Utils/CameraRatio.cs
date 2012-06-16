@@ -50,9 +50,6 @@ public class CameraRatio : MonoBehaviour {
 		camera.rect = rect;
 	}
 
-	private int checkIncrement = 1;
-	private float nextCheck = 0;
-
 	public void Update()
 	{
 		if (Application.isEditor)
@@ -60,16 +57,18 @@ public class CameraRatio : MonoBehaviour {
 			this.UpdateCameraViewport();
 			return;
 		}
+	}
 
-		if (this.checkIncrement == 0)
-			return;
-		if (Time.realtimeSinceStartup > this.nextCheck)
-		{
+	public void OnApplicationPause(bool isPause)
+	{
+		if (!isPause)
 			this.UpdateCameraViewport();
+	}
 
-			this.checkIncrement += checkIncrement;
-			this.nextCheck = Time.realtimeSinceStartup + checkIncrement;
-		}
+	public void OnApplicationFocus(bool hasFocus)
+	{
+		if (hasFocus)
+			this.UpdateCameraViewport();
 	}
 
 	public void OnDrawGizmos()
